@@ -8,10 +8,10 @@ package camera
 
 import (
 	context "context"
+	common "github.com/brianwong1861/smartcam-common/shared-proto/common"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	common "smartcam-proto/common"
 )
 
 // This is a compile-time assertion to ensure that this generated file

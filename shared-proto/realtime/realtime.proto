@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package realtime;
 
-option go_package = "smartcam-proto/realtime";
+option go_package = "github.com/brianwong1861/smartcam-common/shared-proto/realtime";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";

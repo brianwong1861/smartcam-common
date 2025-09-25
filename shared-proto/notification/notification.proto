@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notification;
 
-option go_package = "smartcam-proto/notification";
+option go_package = "github.com/brianwong1861/smartcam-common/shared-proto/notification";
 
 import "google/protobuf/timestamp.proto";
 
