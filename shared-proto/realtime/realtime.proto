@@ -1,0 +1,214 @@
+syntax = "proto3";
+
+package realtime;
+
+option go_package = "smartcam-proto/realtime";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "common/common.proto";
+
+// RealtimeService provides WebRTC signaling and real-time communication
+service RealtimeService {
+    // WebRTC Signaling Session Management
+    rpc CreateSignalingSession(CreateSignalingSessionRequest) returns (CreateSignalingSessionResponse);
+    rpc GetSignalingSession(GetSignalingSessionRequest) returns (GetSignalingSessionResponse);
+    rpc CloseSignalingSession(CloseSignalingSessionRequest) returns (CloseSignalingSessionResponse);
+    rpc GetUserSessions(GetUserSessionsRequest) returns (GetUserSessionsResponse);
+
+    // WebRTC SDP Exchange
+    rpc ProcessSDPOffer(ProcessSDPOfferRequest) returns (ProcessSDPOfferResponse);
+    rpc ProcessSDPAnswer(ProcessSDPAnswerRequest) returns (ProcessSDPAnswerResponse);
+
+    // ICE Candidate Exchange
+    rpc AddICECandidate(AddICECandidateRequest) returns (AddICECandidateResponse);
+    rpc GetICECandidates(GetICECandidatesRequest) returns (GetICECandidatesResponse);
+
+    // Connection State Management
+    rpc UpdateConnectionState(UpdateConnectionStateRequest) returns (UpdateConnectionStateResponse);
+
+    // Connection Quality Metrics
+    rpc RecordConnectionMetrics(RecordConnectionMetricsRequest) returns (RecordConnectionMetricsResponse);
+    rpc GetConnectionMetrics(GetConnectionMetricsRequest) returns (GetConnectionMetricsResponse);
+
+    // Health Check
+    rpc HealthCheck(common.HealthCheckRequest) returns (common.HealthCheckResponse);
+}
+
+// ===== Message Definitions =====
+
+// Signaling Session Messages
+message SignalingSession {
+    string session_id = 1;
+    string stream_id = 2;
+    string client_id = 3;
+    uint64 user_id = 4;
+    uint64 tenant_id = 5;
+    string channel_name = 6;
+    string channel_arn = 7;
+    string state = 8;
+    google.protobuf.Timestamp created_at = 9;
+    google.protobuf.Timestamp expires_at = 10;
+}
+
+message WebRTCConfig {
+    string signaling_channel_arn = 1;
+    string websocket_url = 2;
+    repeated string stun_servers = 3;
+}
+
+// Create Signaling Session
+message CreateSignalingSessionRequest {
+    string stream_id = 1;
+    string client_id = 2;
+    uint64 user_id = 3;
+    uint64 tenant_id = 4;
+    int32 session_timeout = 5; // Optional timeout in seconds
+}
+
+message CreateSignalingSessionResponse {
+    SignalingSession session = 1;
+    WebRTCConfig webrtc_config = 2;
+    string error_message = 3;
+}
+
+// Get Signaling Session
+message GetSignalingSessionRequest {
+    string session_id = 1;
+    uint64 user_id = 2;
+}
+
+message GetSignalingSessionResponse {
+    SignalingSession session = 1;
+    string error_message = 2;
+}
+
+// Close Signaling Session
+message CloseSignalingSessionRequest {
+    string session_id = 1;
+    uint64 user_id = 2;
+}
+
+message CloseSignalingSessionResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+// Get User Sessions
+message GetUserSessionsRequest {
+    uint64 user_id = 1;
+}
+
+message GetUserSessionsResponse {
+    repeated SignalingSession sessions = 1;
+    string error_message = 2;
+}
+
+// SDP Exchange Messages
+message SDPOffer {
+    string type = 1;
+    string sdp = 2;
+}
+
+message SDPAnswer {
+    string type = 1;
+    string sdp = 2;
+}
+
+message ProcessSDPOfferRequest {
+    string session_id = 1;
+    SDPOffer offer = 2;
+    uint64 user_id = 3;
+}
+
+message ProcessSDPOfferResponse {
+    SDPAnswer answer = 1;
+    string error_message = 2;
+}
+
+message ProcessSDPAnswerRequest {
+    string session_id = 1;
+    SDPAnswer answer = 2;
+    uint64 user_id = 3;
+}
+
+message ProcessSDPAnswerResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+// ICE Candidate Messages
+message ICECandidate {
+    string candidate = 1;
+    string sdp_mid = 2;
+    int32 sdp_mline_index = 3;
+}
+
+message AddICECandidateRequest {
+    string session_id = 1;
+    ICECandidate candidate = 2;
+    uint64 user_id = 3;
+}
+
+message AddICECandidateResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+message GetICECandidatesRequest {
+    string session_id = 1;
+    uint64 user_id = 2;
+}
+
+message GetICECandidatesResponse {
+    repeated ICECandidate candidates = 1;
+    string error_message = 2;
+}
+
+// Connection State Messages
+message UpdateConnectionStateRequest {
+    string session_id = 1;
+    string state = 2; // new, connecting, connected, disconnected, failed, closed
+    uint64 user_id = 3;
+}
+
+message UpdateConnectionStateResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+// Connection Metrics Messages
+message ConnectionMetric {
+    string session_id = 1;
+    double rtt = 2; // Round trip time in ms
+    double packet_loss = 3; // Packet loss percentage
+    double jitter = 4; // Jitter in ms
+    double bandwidth = 5; // Bandwidth in kbps
+    double frame_rate = 6; // Video frame rate
+    double bitrate = 7; // Video bitrate in kbps
+    double buffer_health = 8; // Buffer health percentage
+    string resolution = 9; // Video resolution (e.g., "1920x1080")
+    google.protobuf.Timestamp created_at = 10;
+}
+
+message RecordConnectionMetricsRequest {
+    string session_id = 1;
+    ConnectionMetric metrics = 2;
+    uint64 user_id = 3;
+}
+
+message RecordConnectionMetricsResponse {
+    bool success = 1;
+    string error_message = 2;
+}
+
+message GetConnectionMetricsRequest {
+    string session_id = 1;
+    uint64 user_id = 2;
+    int32 limit = 3; // Number of recent metrics to retrieve
+}
+
+message GetConnectionMetricsResponse {
+    repeated ConnectionMetric metrics = 1;
+    string error_message = 2;
+}

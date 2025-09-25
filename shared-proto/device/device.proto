@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package device;
+
+option go_package = "smartcam-proto/device";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "common/common.proto";
+
+// Device Management Service
+service DeviceService {
+  // Device CRUD Operations
+  rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse);
+  rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse);
+  rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse);
+  rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse);
+  rpc ListDevices(ListDevicesRequest) returns (ListDevicesResponse);
+
+  // Device Status Management
+  rpc UpdateDeviceStatus(UpdateDeviceStatusRequest) returns (UpdateDeviceStatusResponse);
+  rpc GetDeviceStatus(GetDeviceStatusRequest) returns (GetDeviceStatusResponse);
+  rpc SyncDeviceStatus(SyncDeviceStatusRequest) returns (SyncDeviceStatusResponse);
+
+  // Device Configuration
+  rpc GetDeviceConfiguration(GetDeviceConfigurationRequest) returns (GetDeviceConfigurationResponse);
+  rpc UpdateDeviceConfiguration(UpdateDeviceConfigurationRequest) returns (UpdateDeviceConfigurationResponse);
+
+  // Device Commands
+  rpc SendDeviceCommand(SendDeviceCommandRequest) returns (SendDeviceCommandResponse);
+  rpc GetCommandStatus(GetCommandStatusRequest) returns (GetCommandStatusResponse);
+  rpc ListCommands(ListCommandsRequest) returns (ListCommandsResponse);
+
+  // Device Health
+  rpc GetDeviceHealth(GetDeviceHealthRequest) returns (GetDeviceHealthResponse);
+  rpc CheckDeviceConnectivity(CheckDeviceConnectivityRequest) returns (CheckDeviceConnectivityResponse);
+
+  // Device Registration
+  rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+  rpc UnregisterDevice(UnregisterDeviceRequest) returns (UnregisterDeviceResponse);
+  rpc RevokeDeviceCertificate(RevokeDeviceCertificateRequest) returns (RevokeDeviceCertificateResponse);
+}
+
+// Device Models
+message Device {
+  string id = 1;
+  string uuid = 2;
+  string serial_number = 3;
+  string thing_name = 4;
+  string device_type = 5;
+  string status = 6;
+  bool is_online = 7;
+  uint32 tenant_id = 8;
+  google.protobuf.Timestamp last_seen_at = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+  google.protobuf.Struct metadata = 12;
+}
+
+message DeviceConfiguration {
+  string device_id = 1;
+  string thing_name = 2;
+  google.protobuf.Struct configuration = 3;
+  int32 version = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message DeviceCommand {
+  string id = 1;
+  string device_id = 2;
+  string command_type = 3;
+  google.protobuf.Struct payload = 4;
+  string status = 5;
+  string error_message = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  google.protobuf.Timestamp executed_at = 9;
+}
+
+message DeviceHealth {
+  string device_id = 1;
+  int32 health_score = 2;
+  string status = 3;
+  google.protobuf.Timestamp last_check = 4;
+  google.protobuf.Struct metrics = 5;
+  repeated string issues = 6;
+}
+
+// Request/Response Messages
+message CreateDeviceRequest {
+  string serial_number = 1;
+  string device_type = 2;
+  uint32 tenant_id = 3;
+  google.protobuf.Struct metadata = 4;
+}
+
+message CreateDeviceResponse {
+  Device device = 1;
+  string error_message = 2;
+}
+
+message GetDeviceRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetDeviceResponse {
+  Device device = 1;
+  string error_message = 2;
+}
+
+message UpdateDeviceRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+  google.protobuf.Struct updates = 3;
+}
+
+message UpdateDeviceResponse {
+  Device device = 1;
+  string error_message = 2;
+}
+
+message DeleteDeviceRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message DeleteDeviceResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message ListDevicesRequest {
+  uint32 tenant_id = 1;
+  string device_type = 2;
+  string status = 3;
+  optional bool is_online = 4;
+  common.PaginationRequest pagination = 5;
+}
+
+message ListDevicesResponse {
+  repeated Device devices = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}
+
+message UpdateDeviceStatusRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+  string status = 3;
+  optional bool is_online = 4;
+  optional google.protobuf.Timestamp last_seen_at = 5;
+}
+
+message UpdateDeviceStatusResponse {
+  Device device = 1;
+  string error_message = 2;
+}
+
+message GetDeviceStatusRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetDeviceStatusResponse {
+  string status = 1;
+  bool is_online = 2;
+  google.protobuf.Timestamp last_seen_at = 3;
+  string error_message = 4;
+}
+
+message SyncDeviceStatusRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message SyncDeviceStatusResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message GetDeviceConfigurationRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetDeviceConfigurationResponse {
+  DeviceConfiguration configuration = 1;
+  string error_message = 2;
+}
+
+message UpdateDeviceConfigurationRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+  google.protobuf.Struct configuration = 3;
+  optional int32 version = 4;
+}
+
+message UpdateDeviceConfigurationResponse {
+  DeviceConfiguration configuration = 1;
+  string error_message = 2;
+}
+
+message SendDeviceCommandRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+  string command_type = 3;
+  google.protobuf.Struct payload = 4;
+  optional int32 timeout_seconds = 5;
+}
+
+message SendDeviceCommandResponse {
+  DeviceCommand command = 1;
+  string error_message = 2;
+}
+
+message GetCommandStatusRequest {
+  string command_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetCommandStatusResponse {
+  DeviceCommand command = 1;
+  string error_message = 2;
+}
+
+message ListCommandsRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+  string status = 3;
+  common.PaginationRequest pagination = 4;
+}
+
+message ListCommandsResponse {
+  repeated DeviceCommand commands = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}
+
+message GetDeviceHealthRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetDeviceHealthResponse {
+  DeviceHealth health = 1;
+  string error_message = 2;
+}
+
+message CheckDeviceConnectivityRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message CheckDeviceConnectivityResponse {
+  bool is_connected = 1;
+  int32 response_time_ms = 2;
+  string error_message = 3;
+}
+
+message RegisterDeviceRequest {
+  string serial_number = 1;
+  string device_type = 2;
+  uint32 tenant_id = 3;
+  google.protobuf.Struct metadata = 4;
+}
+
+message RegisterDeviceResponse {
+  Device device = 1;
+  string certificate_arn = 2;
+  string error_message = 3;
+}
+
+message UnregisterDeviceRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message UnregisterDeviceResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message RevokeDeviceCertificateRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message RevokeDeviceCertificateResponse {
+  bool success = 1;
+  string error_message = 2;
+}

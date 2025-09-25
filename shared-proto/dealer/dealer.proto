@@ -1,0 +1,285 @@
+syntax = "proto3";
+
+package dealer;
+
+option go_package = "smartcam-proto/dealer";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "common/common.proto";
+
+// Dealer Management Service
+service DealerService {
+  // Dealer CRUD Operations
+  rpc CreateDealer(CreateDealerRequest) returns (CreateDealerResponse);
+  rpc GetDealer(GetDealerRequest) returns (GetDealerResponse);
+  rpc UpdateDealer(UpdateDealerRequest) returns (UpdateDealerResponse);
+  rpc DeleteDealer(DeleteDealerRequest) returns (DeleteDealerResponse);
+  rpc ListDealers(ListDealersRequest) returns (ListDealersResponse);
+
+  // Dealer Status Management
+  rpc UpdateDealerStatus(UpdateDealerStatusRequest) returns (UpdateDealerStatusResponse);
+  rpc GetDealerStatus(GetDealerStatusRequest) returns (GetDealerStatusResponse);
+
+  // Dealer Approval Workflow
+  rpc ApproveDealerApplication(ApproveDealerApplicationRequest) returns (ApproveDealerApplicationResponse);
+  rpc RejectDealerApplication(RejectDealerApplicationRequest) returns (RejectDealerApplicationResponse);
+
+  // Dealer Sub-Dealer Management
+  rpc AddSubDealer(AddSubDealerRequest) returns (AddSubDealerResponse);
+  rpc RemoveSubDealer(RemoveSubDealerRequest) returns (RemoveSubDealerResponse);
+  rpc ListSubDealers(ListSubDealersRequest) returns (ListSubDealersResponse);
+
+  // Service Health
+  rpc GetDealerServiceHealth(GetDealerServiceHealthRequest) returns (GetDealerServiceHealthResponse);
+}
+
+// Dealer Models
+message Dealer {
+  uint32 id = 1;
+  string uuid = 2;
+  string tenant_id = 3;
+  string company_name = 4;
+  string contact_name = 5;
+  string contact_email = 6;
+  string contact_phone = 7;
+  string address = 8;
+  string city = 9;
+  string state = 10;
+  string zip_code = 11;
+  string country = 12;
+  DealerStatus status = 13;
+  DealerType type = 14;
+  bool is_active = 15;
+  optional string parent_dealer_uuid = 16;
+
+  // Approval workflow fields
+  optional string approved_by = 17;
+  optional google.protobuf.Timestamp approved_at = 18;
+  optional string rejected_by = 19;
+  optional google.protobuf.Timestamp rejected_at = 20;
+  optional string reject_reason = 21;
+
+  // Business information
+  optional string business_license = 22;
+  optional string tax_id = 23;
+  optional string website = 24;
+
+  // Timestamps
+  google.protobuf.Timestamp created_at = 25;
+  google.protobuf.Timestamp updated_at = 26;
+
+  // Additional metadata
+  google.protobuf.Struct metadata = 27;
+}
+
+// Dealer Status Enum
+enum DealerStatus {
+  DEALER_STATUS_UNSPECIFIED = 0;
+  DEALER_STATUS_PENDING = 1;
+  DEALER_STATUS_APPROVED = 2;
+  DEALER_STATUS_REJECTED = 3;
+  DEALER_STATUS_SUSPENDED = 4;
+  DEALER_STATUS_INACTIVE = 5;
+}
+
+// Dealer Type Enum
+enum DealerType {
+  DEALER_TYPE_UNSPECIFIED = 0;
+  DEALER_TYPE_PRIMARY = 1;
+  DEALER_TYPE_SUB_DEALER = 2;
+  DEALER_TYPE_PARTNER = 3;
+  DEALER_TYPE_RESELLER = 4;
+}
+
+// Request/Response Messages
+
+// Create Dealer
+message CreateDealerRequest {
+  string tenant_id = 1;
+  string company_name = 2;
+  string contact_name = 3;
+  string contact_email = 4;
+  optional string contact_phone = 5;
+  optional string address = 6;
+  optional string city = 7;
+  optional string state = 8;
+  optional string zip_code = 9;
+  optional string country = 10;
+  DealerType type = 11;
+  optional string parent_dealer_uuid = 12;
+  optional string business_license = 13;
+  optional string tax_id = 14;
+  optional string website = 15;
+  optional google.protobuf.Struct metadata = 16;
+}
+
+message CreateDealerResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Get Dealer
+message GetDealerRequest {
+  string dealer_uuid = 1;
+  optional string tenant_id = 2;
+}
+
+message GetDealerResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Update Dealer
+message UpdateDealerRequest {
+  string dealer_uuid = 1;
+  string tenant_id = 2;
+  optional string company_name = 3;
+  optional string contact_name = 4;
+  optional string contact_email = 5;
+  optional string contact_phone = 6;
+  optional string address = 7;
+  optional string city = 8;
+  optional string state = 9;
+  optional string zip_code = 10;
+  optional string country = 11;
+  optional string business_license = 12;
+  optional string tax_id = 13;
+  optional string website = 14;
+  optional google.protobuf.Struct metadata = 15;
+}
+
+message UpdateDealerResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Delete Dealer
+message DeleteDealerRequest {
+  string dealer_uuid = 1;
+  string tenant_id = 2;
+}
+
+message DeleteDealerResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// List Dealers
+message ListDealersRequest {
+  optional string tenant_id = 1;
+  optional DealerStatus status = 2;
+  optional DealerType type = 3;
+  optional string parent_dealer_uuid = 4;
+  optional string search = 5;
+  common.PaginationRequest pagination = 6;
+}
+
+message ListDealersResponse {
+  repeated Dealer dealers = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}
+
+// Update Dealer Status
+message UpdateDealerStatusRequest {
+  string dealer_uuid = 1;
+  string tenant_id = 2;
+  DealerStatus status = 3;
+  optional string reason = 4;
+}
+
+message UpdateDealerStatusResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Get Dealer Status
+message GetDealerStatusRequest {
+  string dealer_uuid = 1;
+  optional string tenant_id = 2;
+}
+
+message GetDealerStatusResponse {
+  DealerStatus status = 1;
+  bool is_active = 2;
+  google.protobuf.Timestamp last_updated = 3;
+  string error_message = 4;
+}
+
+// Approve Dealer Application
+message ApproveDealerApplicationRequest {
+  string dealer_uuid = 1;
+  string tenant_id = 2;
+  string approved_by = 3;
+  optional string notes = 4;
+}
+
+message ApproveDealerApplicationResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Reject Dealer Application
+message RejectDealerApplicationRequest {
+  string dealer_uuid = 1;
+  string tenant_id = 2;
+  string rejected_by = 3;
+  string reject_reason = 4;
+  optional string notes = 5;
+}
+
+message RejectDealerApplicationResponse {
+  Dealer dealer = 1;
+  string error_message = 2;
+}
+
+// Add Sub-Dealer
+message AddSubDealerRequest {
+  string parent_dealer_uuid = 1;
+  string sub_dealer_uuid = 2;
+  string tenant_id = 3;
+}
+
+message AddSubDealerResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// Remove Sub-Dealer
+message RemoveSubDealerRequest {
+  string parent_dealer_uuid = 1;
+  string sub_dealer_uuid = 2;
+  string tenant_id = 3;
+}
+
+message RemoveSubDealerResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+// List Sub-Dealers
+message ListSubDealersRequest {
+  string parent_dealer_uuid = 1;
+  optional string tenant_id = 2;
+  common.PaginationRequest pagination = 3;
+}
+
+message ListSubDealersResponse {
+  repeated Dealer sub_dealers = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}
+
+// Service Health
+message GetDealerServiceHealthRequest {
+  // Empty request for health check
+}
+
+message GetDealerServiceHealthResponse {
+  bool healthy = 1;
+  string status = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  repeated string services = 4;
+  string error_message = 5;
+}

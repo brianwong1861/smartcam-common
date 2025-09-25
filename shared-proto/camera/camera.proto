@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package camera;
+
+option go_package = "smartcam-proto/camera";
+
+import "google/protobuf/timestamp.proto";
+import "common/common.proto";
+
+// Camera device information
+message Camera {
+  string id = 1;
+  string name = 2;
+  string rtsp_url = 3;
+  string status = 4;
+  string tenant_id = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Device command
+message DeviceCommand {
+  string id = 1;
+  string device_id = 2;
+  string command_type = 3;
+  string payload = 4;
+  string status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp executed_at = 7;
+}
+
+// Camera service definition
+service CameraService {
+  // Device management
+  rpc GetCamera(GetCameraRequest) returns (Camera);
+  rpc ListCameras(ListCamerasRequest) returns (ListCamerasResponse);
+  rpc CreateCamera(CreateCameraRequest) returns (Camera);
+  rpc UpdateCamera(UpdateCameraRequest) returns (Camera);
+  rpc DeleteCamera(DeleteCameraRequest) returns (common.CommonResponse);
+  
+  // Device commands
+  rpc SendCommand(SendCommandRequest) returns (DeviceCommand);
+  rpc GetCommandStatus(GetCommandStatusRequest) returns (DeviceCommand);
+}
+
+// Request/Response messages
+message GetCameraRequest {
+  string camera_id = 1;
+}
+
+message ListCamerasRequest {
+  string tenant_id = 1;
+  common.PaginationRequest pagination = 2;
+}
+
+message ListCamerasResponse {
+  repeated Camera cameras = 1;
+  common.PaginationResponse pagination = 2;
+}
+
+message CreateCameraRequest {
+  string name = 1;
+  string rtsp_url = 2;
+  string tenant_id = 3;
+}
+
+message UpdateCameraRequest {
+  string camera_id = 1;
+  string name = 2;
+  string rtsp_url = 3;
+  string status = 4;
+}
+
+message DeleteCameraRequest {
+  string camera_id = 1;
+}
+
+message SendCommandRequest {
+  string device_id = 1;
+  string command_type = 2;
+  string payload = 3;
+}
+
+message GetCommandStatusRequest {
+  string command_id = 1;
+}

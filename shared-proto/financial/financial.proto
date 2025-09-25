@@ -1,0 +1,389 @@
+syntax = "proto3";
+
+package financial;
+
+option go_package = "github.com/metair/smartcam/shared-proto/financial";
+
+import "google/protobuf/timestamp.proto";
+
+// Enums
+enum RechargeStatus {
+  RECHARGE_STATUS_PENDING = 0;
+  RECHARGE_STATUS_PROCESSING = 1;
+  RECHARGE_STATUS_COMPLETED = 2;
+  RECHARGE_STATUS_FAILED = 3;
+  RECHARGE_STATUS_CANCELLED = 4;
+  RECHARGE_STATUS_REFUNDED = 5;
+}
+
+enum PaymentMethod {
+  PAYMENT_METHOD_ALIPAY = 0;
+  PAYMENT_METHOD_WECHATPAY = 1;
+  PAYMENT_METHOD_BANKCARD = 2;
+  PAYMENT_METHOD_PAYPAL = 3;
+  PAYMENT_METHOD_STRIPE = 4;
+  PAYMENT_METHOD_CREDITCARD = 5;
+}
+
+enum RechargeType {
+  RECHARGE_TYPE_STORAGE = 0;
+  RECHARGE_TYPE_SERVICE = 1;
+  RECHARGE_TYPE_PACKAGE = 2;
+}
+
+enum ProfitSharingStatus {
+  PROFIT_SHARING_STATUS_PENDING = 0;
+  PROFIT_SHARING_STATUS_CALCULATED = 1;
+  PROFIT_SHARING_STATUS_PAID = 2;
+  PROFIT_SHARING_STATUS_CANCELLED = 3;
+}
+
+enum ProfitSharingType {
+  PROFIT_SHARING_TYPE_RECHARGE = 0;
+  PROFIT_SHARING_TYPE_SUBSCRIPTION = 1;
+  PROFIT_SHARING_TYPE_STORAGE = 2;
+  PROFIT_SHARING_TYPE_SERVICE = 3;
+}
+
+// Recharge Messages
+message CreateRechargeRequest {
+  uint32 user_id = 1;
+  string tenant_id = 2;
+  double amount = 3;
+  string currency = 4;
+  RechargeType type = 5;
+  PaymentMethod payment_method = 6;
+  double storage_amount = 7;
+  int32 storage_duration = 8;
+  string description = 9;
+  uint32 created_by = 10;
+}
+
+message CreateRechargeResponse {
+  Recharge recharge = 1;
+}
+
+message GetRechargeRequest {
+  string uuid = 1;
+}
+
+message GetRechargeResponse {
+  Recharge recharge = 1;
+}
+
+message UpdateRechargeRequest {
+  string uuid = 1;
+  optional RechargeStatus status = 2;
+  optional string payment_id = 3;
+  optional string payment_url = 4;
+  optional string failed_reason = 5;
+  optional double refund_amount = 6;
+  optional string refund_reason = 7;
+  uint32 updated_by = 8;
+}
+
+message UpdateRechargeResponse {
+  Recharge recharge = 1;
+}
+
+message ListRechargesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort_by = 3;
+  string sort_order = 4;
+  optional uint32 user_id = 5;
+  string dealer_uuid = 6;
+  optional RechargeStatus status = 7;
+  optional RechargeType type = 8;
+  optional PaymentMethod payment_method = 9;
+  string start_date = 10;
+  string end_date = 11;
+  string search = 12;
+}
+
+message ListRechargesResponse {
+  repeated Recharge recharges = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+message ProcessRefundRequest {
+  string uuid = 1;
+  double refund_amount = 2;
+  string refund_reason = 3;
+  uint32 processed_by = 4;
+}
+
+message ProcessRefundResponse {
+  Recharge recharge = 1;
+}
+
+message GetRechargeStatisticsRequest {
+  optional uint32 user_id = 1;
+  string dealer_uuid = 2;
+  string start_date = 3;
+  string end_date = 4;
+}
+
+message GetRechargeStatisticsResponse {
+  RechargeStatistics statistics = 1;
+}
+
+// Profit Sharing Messages
+message CreateProfitSharingRequest {
+  string dealer_uuid = 1;
+  uint32 user_id = 2;
+  ProfitSharingType source_type = 3;
+  uint32 source_id = 4;
+  double source_amount = 5;
+  double commission_rate = 6;
+  google.protobuf.Timestamp period_start = 7;
+  google.protobuf.Timestamp period_end = 8;
+  string notes = 9;
+  string tenant_id = 10;
+}
+
+message CreateProfitSharingResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+message GetProfitSharingRequest {
+  string uuid = 1;
+}
+
+message GetProfitSharingResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+message UpdateProfitSharingRequest {
+  string uuid = 1;
+  optional ProfitSharingStatus status = 2;
+  optional double commission_rate = 3;
+  optional string notes = 4;
+  uint32 updated_by = 5;
+}
+
+message UpdateProfitSharingResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+message ListProfitSharingRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string dealer_uuid = 3;
+  optional uint32 user_id = 4;
+  optional ProfitSharingStatus status = 5;
+  optional ProfitSharingType source_type = 6;
+  optional google.protobuf.Timestamp start_date = 7;
+  optional google.protobuf.Timestamp end_date = 8;
+  string sort_by = 9;
+  string sort_order = 10;
+}
+
+message ListProfitSharingResponse {
+  repeated ProfitSharing data = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+  int32 total_pages = 5;
+}
+
+message CalculateProfitSharingForRechargeRequest {
+  string recharge_uuid = 1;
+  string dealer_uuid = 2;
+  double commission_rate = 3;
+}
+
+message CalculateProfitSharingForRechargeResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+message MarkProfitSharingAsPaidRequest {
+  string uuid = 1;
+  string payment_method = 2;
+  string payment_ref = 3;
+}
+
+message MarkProfitSharingAsPaidResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+message CancelProfitSharingRequest {
+  string uuid = 1;
+  string reason = 2;
+}
+
+message CancelProfitSharingResponse {
+  ProfitSharing profit_sharing = 1;
+}
+
+// Financial Statement Messages
+message GenerateFinancialStatementRequest {
+  string dealer_uuid = 1;
+  google.protobuf.Timestamp period_start = 2;
+  google.protobuf.Timestamp period_end = 3;
+  string notes = 4;
+  string tenant_id = 5;
+}
+
+message GenerateFinancialStatementResponse {
+  FinancialStatement statement = 1;
+}
+
+message GetFinancialStatementRequest {
+  string uuid = 1;
+}
+
+message GetFinancialStatementResponse {
+  FinancialStatement statement = 1;
+}
+
+message ApproveFinancialStatementRequest {
+  string uuid = 1;
+  uint32 approved_by = 2;
+}
+
+message ApproveFinancialStatementResponse {
+  FinancialStatement statement = 1;
+}
+
+message ListFinancialStatementsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string sort_by = 3;
+  string sort_order = 4;
+  string dealer_uuid = 5;
+  string status = 6;
+  optional google.protobuf.Timestamp start_date = 7;
+  optional google.protobuf.Timestamp end_date = 8;
+}
+
+message ListFinancialStatementsResponse {
+  repeated FinancialStatement statements = 1;
+  int64 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+// Data Models
+message Recharge {
+  uint32 id = 1;
+  string uuid = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  uint32 user_id = 5;
+  string tenant_id = 6;
+  string dealer_uuid = 7;
+  double amount = 8;
+  string currency = 9;
+  RechargeType type = 10;
+  RechargeStatus status = 11;
+  PaymentMethod payment_method = 12;
+  string payment_id = 13;
+  string payment_url = 14;
+  double storage_amount = 15;
+  int32 storage_duration = 16;
+  optional google.protobuf.Timestamp processed_at = 17;
+  optional google.protobuf.Timestamp completed_at = 18;
+  optional google.protobuf.Timestamp failed_at = 19;
+  string failed_reason = 20;
+  optional google.protobuf.Timestamp refunded_at = 21;
+  double refund_amount = 22;
+  string refund_reason = 23;
+  string description = 24;
+  string ip_address = 25;
+  string user_agent = 26;
+  uint32 created_by = 27;
+  optional uint32 updated_by = 28;
+}
+
+message ProfitSharing {
+  uint32 id = 1;
+  string uuid = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  string tenant_id = 5;
+  string dealer_uuid = 6;
+  string dealer_name = 7;
+  uint32 user_id = 8;
+  string user_name = 9;
+  ProfitSharingType source_type = 10;
+  uint32 source_id = 11;
+  double source_amount = 12;
+  double commission_rate = 13;
+  double commission_amount = 14;
+  double net_amount = 15;
+  google.protobuf.Timestamp calculation_date = 16;
+  google.protobuf.Timestamp period_start = 17;
+  google.protobuf.Timestamp period_end = 18;
+  ProfitSharingStatus status = 19;
+  optional google.protobuf.Timestamp processed_at = 20;
+  optional uint32 processed_by = 21;
+  optional google.protobuf.Timestamp payment_date = 22;
+  string payment_method = 23;
+  string payment_ref = 24;
+  string notes = 25;
+}
+
+message FinancialStatement {
+  uint32 id = 1;
+  string uuid = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  string tenant_id = 5;
+  string dealer_uuid = 6;
+  string dealer_name = 7;
+  google.protobuf.Timestamp period_start = 8;
+  google.protobuf.Timestamp period_end = 9;
+  double total_revenue = 10;
+  double total_commission = 11;
+  double net_revenue = 12;
+  int64 total_recharges = 13;
+  double pending_commission = 14;
+  double paid_commission = 15;
+  string status = 16;
+  google.protobuf.Timestamp generated_at = 17;
+  optional google.protobuf.Timestamp approved_at = 18;
+  optional uint32 approved_by = 19;
+  string notes = 20;
+}
+
+message RechargeStatistics {
+  int64 total_recharges = 1;
+  double total_amount = 2;
+  int64 completed_recharges = 3;
+  double completed_amount = 4;
+  int64 pending_recharges = 5;
+  int64 failed_recharges = 6;
+  int64 refunded_recharges = 7;
+  double refunded_amount = 8;
+  double average_amount = 9;
+  double success_rate = 10;
+}
+
+// Financial Service Definition
+service FinancialService {
+  // Recharge management
+  rpc CreateRecharge(CreateRechargeRequest) returns (CreateRechargeResponse);
+  rpc GetRecharge(GetRechargeRequest) returns (GetRechargeResponse);
+  rpc UpdateRecharge(UpdateRechargeRequest) returns (UpdateRechargeResponse);
+  rpc ListRecharges(ListRechargesRequest) returns (ListRechargesResponse);
+  rpc ProcessRefund(ProcessRefundRequest) returns (ProcessRefundResponse);
+  rpc GetRechargeStatistics(GetRechargeStatisticsRequest) returns (GetRechargeStatisticsResponse);
+
+  // Profit sharing management
+  rpc CreateProfitSharing(CreateProfitSharingRequest) returns (CreateProfitSharingResponse);
+  rpc GetProfitSharing(GetProfitSharingRequest) returns (GetProfitSharingResponse);
+  rpc UpdateProfitSharing(UpdateProfitSharingRequest) returns (UpdateProfitSharingResponse);
+  rpc ListProfitSharing(ListProfitSharingRequest) returns (ListProfitSharingResponse);
+  rpc CalculateProfitSharingForRecharge(CalculateProfitSharingForRechargeRequest) returns (CalculateProfitSharingForRechargeResponse);
+  rpc MarkProfitSharingAsPaid(MarkProfitSharingAsPaidRequest) returns (MarkProfitSharingAsPaidResponse);
+  rpc CancelProfitSharing(CancelProfitSharingRequest) returns (CancelProfitSharingResponse);
+
+  // Financial statement management
+  rpc GenerateFinancialStatement(GenerateFinancialStatementRequest) returns (GenerateFinancialStatementResponse);
+  rpc GetFinancialStatement(GetFinancialStatementRequest) returns (GetFinancialStatementResponse);
+  rpc ApproveFinancialStatement(ApproveFinancialStatementRequest) returns (ApproveFinancialStatementResponse);
+  rpc ListFinancialStatements(ListFinancialStatementsRequest) returns (ListFinancialStatementsResponse);
+}

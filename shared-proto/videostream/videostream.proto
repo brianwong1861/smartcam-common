@@ -1,0 +1,262 @@
+syntax = "proto3";
+
+package videostream;
+
+option go_package = "smartcam-proto/videostream";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "common/common.proto";
+
+// Video Stream Management Service
+service VideoStreamService {
+  // Stream Lifecycle Management
+  rpc StartStream(StartStreamRequest) returns (StartStreamResponse);
+  rpc StopStream(StopStreamRequest) returns (StopStreamResponse);
+  rpc GetStreamStatus(GetStreamStatusRequest) returns (GetStreamStatusResponse);
+  rpc ListActiveStreams(ListActiveStreamsRequest) returns (ListActiveStreamsResponse);
+
+  // Stream Configuration
+  rpc UpdateStreamConfiguration(UpdateStreamConfigurationRequest) returns (UpdateStreamConfigurationResponse);
+  rpc GetStreamConfiguration(GetStreamConfigurationRequest) returns (GetStreamConfigurationResponse);
+
+  // Stream Health and Monitoring
+  rpc GetStreamHealth(GetStreamHealthRequest) returns (GetStreamHealthResponse);
+  rpc GetStreamMetrics(GetStreamMetricsRequest) returns (GetStreamMetricsResponse);
+
+  // Recording Management
+  rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse);
+  rpc StopRecording(StopRecordingRequest) returns (StopRecordingResponse);
+  rpc GetRecordingStatus(GetRecordingStatusRequest) returns (GetRecordingStatusResponse);
+  rpc ListRecordings(ListRecordingsRequest) returns (ListRecordingsResponse);
+}
+
+// Stream Models
+message Stream {
+  string id = 1;
+  string camera_id = 2;
+  string rtsp_url = 3;
+  string kinesis_stream_name = 4;
+  string status = 5; // ACTIVE, INACTIVE, ERROR, STARTING, STOPPING
+  uint32 tenant_id = 6;
+  StreamConfiguration configuration = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Timestamp last_active_at = 10;
+  google.protobuf.Struct metadata = 11;
+}
+
+message StreamConfiguration {
+  string stream_id = 1;
+  VideoSettings video_settings = 2;
+  AudioSettings audio_settings = 3;
+  RecordingSettings recording_settings = 4;
+  KinesisSettings kinesis_settings = 5;
+  int32 version = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message VideoSettings {
+  int32 width = 1;
+  int32 height = 2;
+  int32 bitrate = 3;
+  int32 framerate = 4;
+  string codec = 5; // H264, H265
+  string quality = 6; // LOW, MEDIUM, HIGH, ULTRA
+}
+
+message AudioSettings {
+  bool enabled = 1;
+  int32 bitrate = 2;
+  int32 sample_rate = 3;
+  string codec = 4; // AAC, MP3
+}
+
+message RecordingSettings {
+  bool enabled = 1;
+  int32 segment_duration_seconds = 2;
+  int32 retention_days = 3;
+  string storage_location = 4; // S3_BUCKET, LOCAL
+  string format = 5; // MP4, HLS
+}
+
+message KinesisSettings {
+  string stream_name = 1;
+  string region = 2;
+  int32 fragment_duration_ms = 3;
+  bool enable_producer_sdk = 4;
+}
+
+message StreamHealth {
+  string stream_id = 1;
+  int32 health_score = 2; // 0-100
+  string status = 3;
+  google.protobuf.Timestamp last_check = 4;
+  repeated string issues = 5;
+  StreamMetrics metrics = 6;
+}
+
+message StreamMetrics {
+  string stream_id = 1;
+  int64 bytes_sent = 2;
+  int64 frames_sent = 3;
+  int32 current_bitrate = 4;
+  double frame_drop_rate = 5;
+  int32 latency_ms = 6;
+  google.protobuf.Timestamp measured_at = 7;
+}
+
+message Recording {
+  string id = 1;
+  string stream_id = 2;
+  string camera_id = 3;
+  string file_path = 4;
+  string status = 5; // RECORDING, COMPLETED, FAILED, STOPPED
+  uint32 tenant_id = 6;
+  int64 file_size_bytes = 7;
+  int32 duration_seconds = 8;
+  google.protobuf.Timestamp started_at = 9;
+  google.protobuf.Timestamp ended_at = 10;
+  google.protobuf.Struct metadata = 11;
+}
+
+// Request/Response Messages
+
+// Stream Lifecycle
+message StartStreamRequest {
+  string camera_id = 1;
+  uint32 tenant_id = 2;
+  StreamConfiguration configuration = 3;
+}
+
+message StartStreamResponse {
+  Stream stream = 1;
+  string error_message = 2;
+}
+
+message StopStreamRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+  bool force = 3;
+}
+
+message StopStreamResponse {
+  bool success = 1;
+  string error_message = 2;
+}
+
+message GetStreamStatusRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetStreamStatusResponse {
+  Stream stream = 1;
+  string error_message = 2;
+}
+
+message ListActiveStreamsRequest {
+  uint32 tenant_id = 1;
+  string camera_id = 2;
+  string status = 3;
+  common.PaginationRequest pagination = 4;
+}
+
+message ListActiveStreamsResponse {
+  repeated Stream streams = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}
+
+// Stream Configuration
+message UpdateStreamConfigurationRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+  StreamConfiguration configuration = 3;
+}
+
+message UpdateStreamConfigurationResponse {
+  StreamConfiguration configuration = 1;
+  string error_message = 2;
+}
+
+message GetStreamConfigurationRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetStreamConfigurationResponse {
+  StreamConfiguration configuration = 1;
+  string error_message = 2;
+}
+
+// Stream Health and Monitoring
+message GetStreamHealthRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetStreamHealthResponse {
+  StreamHealth health = 1;
+  string error_message = 2;
+}
+
+message GetStreamMetricsRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+}
+
+message GetStreamMetricsResponse {
+  repeated StreamMetrics metrics = 1;
+  string error_message = 2;
+}
+
+// Recording Management
+message StartRecordingRequest {
+  string stream_id = 1;
+  uint32 tenant_id = 2;
+  RecordingSettings settings = 3;
+}
+
+message StartRecordingResponse {
+  Recording recording = 1;
+  string error_message = 2;
+}
+
+message StopRecordingRequest {
+  string recording_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message StopRecordingResponse {
+  Recording recording = 1;
+  string error_message = 2;
+}
+
+message GetRecordingStatusRequest {
+  string recording_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetRecordingStatusResponse {
+  Recording recording = 1;
+  string error_message = 2;
+}
+
+message ListRecordingsRequest {
+  uint32 tenant_id = 1;
+  string stream_id = 2;
+  string camera_id = 3;
+  string status = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  common.PaginationRequest pagination = 7;
+}
+
+message ListRecordingsResponse {
+  repeated Recording recordings = 1;
+  common.PaginationResponse pagination = 2;
+  string error_message = 3;
+}

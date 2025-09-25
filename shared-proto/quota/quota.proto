@@ -1,0 +1,436 @@
+syntax = "proto3";
+
+package quota;
+
+option go_package = "github.com/metair/smartcam/shared-proto/quota";
+
+import "google/protobuf/timestamp.proto";
+
+// Quota Management Service
+service QuotaService {
+  // Storage Quota Operations
+  rpc CreateStorageQuota(CreateStorageQuotaRequest) returns (CreateStorageQuotaResponse);
+  rpc GetStorageQuota(GetStorageQuotaRequest) returns (GetStorageQuotaResponse);
+  rpc UpdateStorageQuota(UpdateStorageQuotaRequest) returns (UpdateStorageQuotaResponse);
+  rpc DeleteStorageQuota(DeleteStorageQuotaRequest) returns (DeleteStorageQuotaResponse);
+  rpc ListStorageQuotas(ListStorageQuotasRequest) returns (ListStorageQuotasResponse);
+
+  // Quota Usage Operations
+  rpc UpdateQuotaUsage(UpdateQuotaUsageRequest) returns (UpdateQuotaUsageResponse);
+  rpc GetQuotaUsage(GetQuotaUsageRequest) returns (GetQuotaUsageResponse);
+  rpc ListQuotaUsage(ListQuotaUsageRequest) returns (ListQuotaUsageResponse);
+
+  // Quota Alert Operations
+  rpc GetQuotaAlerts(GetQuotaAlertsRequest) returns (GetQuotaAlertsResponse);
+  rpc MarkAlertAsRead(MarkAlertAsReadRequest) returns (MarkAlertAsReadResponse);
+  rpc ListQuotaAlerts(ListQuotaAlertsRequest) returns (ListQuotaAlertsResponse);
+
+  // Quota History Operations
+  rpc GetQuotaHistory(GetQuotaHistoryRequest) returns (GetQuotaHistoryResponse);
+  rpc ListQuotaHistory(ListQuotaHistoryRequest) returns (ListQuotaHistoryResponse);
+
+  // Statistics and Analytics
+  rpc GetQuotaStats(GetQuotaStatsRequest) returns (GetQuotaStatsResponse);
+  rpc GetTenantQuotaOverview(GetTenantQuotaOverviewRequest) returns (GetTenantQuotaOverviewResponse);
+}
+
+// Enums
+enum QuotaType {
+  QUOTA_TYPE_STORAGE = 0;
+  QUOTA_TYPE_BANDWIDTH = 1;
+  QUOTA_TYPE_REQUESTS = 2;
+}
+
+enum AlertType {
+  ALERT_TYPE_WARNING = 0;
+  ALERT_TYPE_CRITICAL = 1;
+  ALERT_TYPE_EXCEEDED = 2;
+}
+
+enum AlertStatus {
+  ALERT_STATUS_UNREAD = 0;
+  ALERT_STATUS_READ = 1;
+  ALERT_STATUS_RESOLVED = 2;
+}
+
+enum ActionType {
+  ACTION_TYPE_ALLOCATED = 0;
+  ACTION_TYPE_DEALLOCATED = 1;
+  ACTION_TYPE_USED = 2;
+  ACTION_TYPE_RELEASED = 3;
+  ACTION_TYPE_EXPIRED = 4;
+  ACTION_TYPE_THRESHOLD_CHANGED = 5;
+}
+
+// Messages for Storage Quota
+message StorageQuota {
+  uint32 id = 1;
+  string uuid = 2;
+  uint32 user_id = 3;
+  string tenant_id = 4;
+  int64 total_quota = 5;
+  int64 used_quota = 6;
+  int64 available_quota = 7;
+  int64 reserved_quota = 8;
+  double warning_threshold = 9;
+  double critical_threshold = 10;
+  bool auto_expand = 11;
+  int64 max_expansion = 12;
+  google.protobuf.Timestamp expires_at = 13;
+  bool is_unlimited = 14;
+  bool is_active = 15;
+  string metadata = 16;
+  google.protobuf.Timestamp created_at = 17;
+  google.protobuf.Timestamp updated_at = 18;
+  uint32 created_by = 19;
+  uint32 updated_by = 20;
+}
+
+message QuotaUsage {
+  uint32 id = 1;
+  string uuid = 2;
+  uint32 quota_id = 3;
+  string operation = 4;
+  int64 amount = 5;
+  int64 quota_before = 6;
+  int64 quota_after = 7;
+  string source = 8;
+  string description = 9;
+  string metadata = 10;
+  google.protobuf.Timestamp timestamp = 11;
+  string tenant_id = 12;
+  uint32 user_id = 13;
+}
+
+message QuotaAlert {
+  uint32 id = 1;
+  string uuid = 2;
+  uint32 quota_id = 3;
+  AlertType alert_type = 4;
+  AlertStatus status = 5;
+  string message = 6;
+  double threshold = 7;
+  double current_usage = 8;
+  int64 current_usage_bytes = 9;
+  string metadata = 10;
+  google.protobuf.Timestamp triggered_at = 11;
+  google.protobuf.Timestamp read_at = 12;
+  google.protobuf.Timestamp resolved_at = 13;
+  string tenant_id = 14;
+  uint32 user_id = 15;
+}
+
+message QuotaHistory {
+  uint32 id = 1;
+  string uuid = 2;
+  uint32 quota_id = 3;
+  ActionType action = 4;
+  int64 amount = 5;
+  int64 quota_before = 6;
+  int64 quota_after = 7;
+  string description = 8;
+  string metadata = 9;
+  google.protobuf.Timestamp timestamp = 10;
+  string tenant_id = 11;
+  uint32 user_id = 12;
+  uint32 performed_by = 13;
+}
+
+// Storage Quota Requests/Responses
+message CreateStorageQuotaRequest {
+  uint32 user_id = 1;
+  string tenant_id = 2;
+  int64 total_quota = 3;
+  double warning_threshold = 4;
+  double critical_threshold = 5;
+  bool auto_expand = 6;
+  int64 max_expansion = 7;
+  google.protobuf.Timestamp expires_at = 8;
+  bool is_unlimited = 9;
+  string metadata = 10;
+  uint32 created_by = 11;
+}
+
+message CreateStorageQuotaResponse {
+  bool success = 1;
+  string message = 2;
+  StorageQuota quota = 3;
+}
+
+message GetStorageQuotaRequest {
+  oneof identifier {
+    uint32 id = 1;
+    string uuid = 2;
+  }
+  string tenant_id = 3;
+}
+
+message GetStorageQuotaResponse {
+  bool success = 1;
+  string message = 2;
+  StorageQuota quota = 3;
+}
+
+message UpdateStorageQuotaRequest {
+  oneof identifier {
+    uint32 id = 1;
+    string uuid = 2;
+  }
+  string tenant_id = 3;
+  optional int64 total_quota = 4;
+  optional double warning_threshold = 5;
+  optional double critical_threshold = 6;
+  optional bool auto_expand = 7;
+  optional int64 max_expansion = 8;
+  optional google.protobuf.Timestamp expires_at = 9;
+  optional bool is_unlimited = 10;
+  optional bool is_active = 11;
+  optional string metadata = 12;
+  uint32 updated_by = 13;
+}
+
+message UpdateStorageQuotaResponse {
+  bool success = 1;
+  string message = 2;
+  StorageQuota quota = 3;
+}
+
+message DeleteStorageQuotaRequest {
+  oneof identifier {
+    uint32 id = 1;
+    string uuid = 2;
+  }
+  string tenant_id = 3;
+}
+
+message DeleteStorageQuotaResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ListStorageQuotasRequest {
+  string tenant_id = 1;
+  optional uint32 user_id = 2;
+  optional bool is_active = 3;
+  optional bool is_unlimited = 4;
+  int32 page = 5;
+  int32 limit = 6;
+  string sort_by = 7;
+  string sort_order = 8;
+}
+
+message ListStorageQuotasResponse {
+  bool success = 1;
+  string message = 2;
+  repeated StorageQuota quotas = 3;
+  int64 total = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+// Quota Usage Requests/Responses
+message UpdateQuotaUsageRequest {
+  oneof quota_identifier {
+    uint32 quota_id = 1;
+    string quota_uuid = 2;
+  }
+  string tenant_id = 3;
+  uint32 user_id = 4;
+  string operation = 5;
+  int64 amount = 6;
+  string source = 7;
+  string description = 8;
+  string metadata = 9;
+}
+
+message UpdateQuotaUsageResponse {
+  bool success = 1;
+  string message = 2;
+  QuotaUsage usage = 3;
+  StorageQuota updated_quota = 4;
+  repeated QuotaAlert triggered_alerts = 5;
+}
+
+message GetQuotaUsageRequest {
+  oneof quota_identifier {
+    uint32 quota_id = 1;
+    string quota_uuid = 2;
+  }
+  string tenant_id = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+}
+
+message GetQuotaUsageResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaUsage usage_records = 3;
+  int64 total_usage = 4;
+  int64 total_records = 5;
+}
+
+message ListQuotaUsageRequest {
+  string tenant_id = 1;
+  optional uint32 user_id = 2;
+  optional uint32 quota_id = 3;
+  optional string operation = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  int32 page = 7;
+  int32 limit = 8;
+  string sort_by = 9;
+  string sort_order = 10;
+}
+
+message ListQuotaUsageResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaUsage usage_records = 3;
+  int64 total = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+// Quota Alert Requests/Responses
+message GetQuotaAlertsRequest {
+  oneof quota_identifier {
+    uint32 quota_id = 1;
+    string quota_uuid = 2;
+  }
+  string tenant_id = 3;
+  optional AlertStatus status = 4;
+  optional AlertType alert_type = 5;
+}
+
+message GetQuotaAlertsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaAlert alerts = 3;
+  int64 total = 4;
+}
+
+message MarkAlertAsReadRequest {
+  oneof identifier {
+    uint32 id = 1;
+    string uuid = 2;
+  }
+  string tenant_id = 3;
+}
+
+message MarkAlertAsReadResponse {
+  bool success = 1;
+  string message = 2;
+  QuotaAlert alert = 3;
+}
+
+message ListQuotaAlertsRequest {
+  string tenant_id = 1;
+  optional uint32 user_id = 2;
+  optional AlertStatus status = 3;
+  optional AlertType alert_type = 4;
+  int32 page = 5;
+  int32 limit = 6;
+  string sort_by = 7;
+  string sort_order = 8;
+}
+
+message ListQuotaAlertsResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaAlert alerts = 3;
+  int64 total = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+// Quota History Requests/Responses
+message GetQuotaHistoryRequest {
+  oneof quota_identifier {
+    uint32 quota_id = 1;
+    string quota_uuid = 2;
+  }
+  string tenant_id = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  optional ActionType action = 6;
+}
+
+message GetQuotaHistoryResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaHistory history = 3;
+  int64 total = 4;
+}
+
+message ListQuotaHistoryRequest {
+  string tenant_id = 1;
+  optional uint32 user_id = 2;
+  optional uint32 quota_id = 3;
+  optional ActionType action = 4;
+  google.protobuf.Timestamp start_date = 5;
+  google.protobuf.Timestamp end_date = 6;
+  int32 page = 7;
+  int32 limit = 8;
+  string sort_by = 9;
+  string sort_order = 10;
+}
+
+message ListQuotaHistoryResponse {
+  bool success = 1;
+  string message = 2;
+  repeated QuotaHistory history = 3;
+  int64 total = 4;
+  int32 page = 5;
+  int32 limit = 6;
+}
+
+// Statistics Requests/Responses
+message GetQuotaStatsRequest {
+  string tenant_id = 1;
+  optional uint32 user_id = 2;
+  google.protobuf.Timestamp start_date = 3;
+  google.protobuf.Timestamp end_date = 4;
+}
+
+message QuotaStats {
+  int64 total_quotas = 1;
+  int64 active_quotas = 2;
+  int64 total_allocated = 3;
+  int64 total_used = 4;
+  int64 total_available = 5;
+  double average_usage_percentage = 6;
+  int64 quotas_over_warning = 7;
+  int64 quotas_over_critical = 8;
+  int64 expired_quotas = 9;
+  int64 unlimited_quotas = 10;
+}
+
+message GetQuotaStatsResponse {
+  bool success = 1;
+  string message = 2;
+  QuotaStats stats = 3;
+}
+
+message GetTenantQuotaOverviewRequest {
+  string tenant_id = 1;
+}
+
+message TenantQuotaOverview {
+  string tenant_id = 1;
+  int64 total_users = 2;
+  int64 total_quotas = 3;
+  int64 total_allocated = 4;
+  int64 total_used = 5;
+  int64 total_available = 6;
+  double usage_percentage = 7;
+  int64 active_alerts = 8;
+  int64 critical_alerts = 9;
+  int64 users_over_warning = 10;
+  int64 users_over_critical = 11;
+}
+
+message GetTenantQuotaOverviewResponse {
+  bool success = 1;
+  string message = 2;
+  TenantQuotaOverview overview = 3;
+}

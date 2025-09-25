@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package iam;
+
+option go_package = "smartcam-proto/iam";
+
+import "google/protobuf/timestamp.proto";
+
+// Service Definition
+service IamService {
+  // Authentication
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc RefreshToken(RefreshTokenRequest) returns (TokenPair);
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
+
+  // User Management
+  rpc GetUserProfile(GetUserProfileRequest) returns (User);
+  rpc UpdateUserProfile(UpdateUserProfileRequest) returns (User);
+  rpc ChangePassword(ChangePasswordRequest) returns (Empty);
+
+  // Tenant Management
+  rpc CreateTenant(CreateTenantRequest) returns (Tenant);
+  rpc GetTenant(GetTenantRequest) returns (Tenant);
+  
+  // Permission Management
+  rpc GrantPermission(GrantPermissionRequest) returns (Permission);
+  rpc RevokePermission(RevokePermissionRequest) returns (Empty);
+  rpc CheckPermission(CheckPermissionRequest) returns (CheckPermissionResponse);
+  rpc GetUserPermissions(GetUserPermissionsRequest) returns (GetUserPermissionsResponse);
+  rpc GetResourcePermissions(GetResourcePermissionsRequest) returns (GetResourcePermissionsResponse);
+}
+
+// Messages
+message User {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string email = 4;
+  string role = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message Tenant {
+  string id = 1;
+  string name = 2;
+  string code = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message Permission {
+  string id = 1;
+  string user_id = 2;
+  string resource_id = 3;
+  string permission_type = 4;
+  string tenant_id = 5;
+  string granted_by = 6;
+  google.protobuf.Timestamp granted_at = 7;
+}
+
+message TokenPair {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+// --- Request/Response Messages ---
+
+message RegisterRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  string tenant_name = 4; // Optional: for creating a new tenant during registration
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  User user = 1;
+  TokenPair tokens = 2;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message ValidateTokenRequest {
+  string token = 1;
+}
+
+message ValidateTokenResponse {
+  bool is_valid = 1;
+  string user_id = 2;
+  string tenant_id = 3;
+  string role = 4;
+}
+
+message GetUserProfileRequest {
+  string user_id = 1;
+}
+
+message UpdateUserProfileRequest {
+  string user_id = 1;
+  string name = 2;
+}
+
+message ChangePasswordRequest {
+  string user_id = 1;
+  string old_password = 2;
+  string new_password = 3;
+}
+
+message CreateTenantRequest {
+  string name = 1;
+  string owner_id = 2;
+}
+
+message GetTenantRequest {
+  string tenant_id = 1;
+}
+
+// Permission Management Messages
+message GrantPermissionRequest {
+  string user_id = 1;
+  string resource_id = 2;
+  string permission_type = 3;
+  string tenant_id = 4;
+  string granted_by = 5;
+}
+
+message RevokePermissionRequest {
+  string user_id = 1;
+  string resource_id = 2;
+  string tenant_id = 3;
+}
+
+message CheckPermissionRequest {
+  string user_id = 1;
+  string resource_id = 2;
+  string permission_type = 3;
+  string tenant_id = 4;
+}
+
+message CheckPermissionResponse {
+  bool has_permission = 1;
+}
+
+message GetUserPermissionsRequest {
+  string user_id = 1;
+  string tenant_id = 2;
+}
+
+message GetUserPermissionsResponse {
+  repeated Permission permissions = 1;
+}
+
+message GetResourcePermissionsRequest {
+  string resource_id = 1;
+  string tenant_id = 2;
+}
+
+message GetResourcePermissionsResponse {
+  repeated Permission permissions = 1;
+}
+
+message Empty {}
