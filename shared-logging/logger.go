@@ -1,9 +1,15 @@
 package logging
 
 import (
+	"time"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
+
+// CustomTimeEncoder encodes time in YYYYMMDD:HHMMSS format
+func CustomTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+	enc.AppendString(t.Format("20060102:150405"))
+}
 
 // LoggerConfig holds configuration for logger initialization
 type LoggerConfig struct {
@@ -50,7 +56,7 @@ func NewLogger(config *LoggerConfig) (*zap.Logger, error) {
 	// Standardize encoder configuration
 	zapConfig.Encoding = config.Format
 	zapConfig.EncoderConfig = zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
+		TimeKey:        "time",
 		LevelKey:       "level",
 		NameKey:        "logger",
 		CallerKey:      "caller",
@@ -59,7 +65,7 @@ func NewLogger(config *LoggerConfig) (*zap.Logger, error) {
 		StacktraceKey:  "stacktrace",
 		LineEnding:     zapcore.DefaultLineEnding,
 		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder, // Uses system time in ISO8601 format
+		EncodeTime:     CustomTimeEncoder, // Uses custom YYYYMMDD:HHMMSS format
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
 	}
