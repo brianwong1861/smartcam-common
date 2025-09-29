@@ -366,12 +366,3 @@ message VerifyDeviceResponse {
   string error_message = 7;
 }
 
-message GetDeviceStatusRequest {
-  string device_id = 1;
-  uint32 tenant_id = 2;
-}
-
-message GetDeviceStatusResponse {
-  DeviceStatus device_status = 1;
-  string error_message = 2;
-}

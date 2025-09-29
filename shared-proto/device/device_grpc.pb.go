@@ -35,6 +35,9 @@ const (
 	DeviceService_GetDeviceHealth_FullMethodName           = "/device.DeviceService/GetDeviceHealth"
 	DeviceService_CheckDeviceConnectivity_FullMethodName   = "/device.DeviceService/CheckDeviceConnectivity"
 	DeviceService_RegisterDevice_FullMethodName            = "/device.DeviceService/RegisterDevice"
+	DeviceService_RegisterDeviceByQR_FullMethodName        = "/device.DeviceService/RegisterDeviceByQR"
+	DeviceService_RegisterDeviceByID_FullMethodName        = "/device.DeviceService/RegisterDeviceByID"
+	DeviceService_VerifyDevice_FullMethodName              = "/device.DeviceService/VerifyDevice"
 	DeviceService_UnregisterDevice_FullMethodName          = "/device.DeviceService/UnregisterDevice"
 	DeviceService_RevokeDeviceCertificate_FullMethodName   = "/device.DeviceService/RevokeDeviceCertificate"
 )
@@ -65,6 +68,9 @@ type DeviceServiceClient interface {
 	CheckDeviceConnectivity(ctx context.Context, in *CheckDeviceConnectivityRequest, opts ...grpc.CallOption) (*CheckDeviceConnectivityResponse, error)
 	// Device Registration
 	RegisterDevice(ctx context.Context, in *RegisterDeviceRequest, opts ...grpc.CallOption) (*RegisterDeviceResponse, error)
+	RegisterDeviceByQR(ctx context.Context, in *RegisterDeviceByQRRequest, opts ...grpc.CallOption) (*RegisterDeviceResponse, error)
+	RegisterDeviceByID(ctx context.Context, in *RegisterDeviceByIDRequest, opts ...grpc.CallOption) (*RegisterDeviceResponse, error)
+	VerifyDevice(ctx context.Context, in *VerifyDeviceRequest, opts ...grpc.CallOption) (*VerifyDeviceResponse, error)
 	UnregisterDevice(ctx context.Context, in *UnregisterDeviceRequest, opts ...grpc.CallOption) (*UnregisterDeviceResponse, error)
 	RevokeDeviceCertificate(ctx context.Context, in *RevokeDeviceCertificateRequest, opts ...grpc.CallOption) (*RevokeDeviceCertificateResponse, error)
 }
@@ -221,6 +227,33 @@ func (c *deviceServiceClient) RegisterDevice(ctx context.Context, in *RegisterDe
 	return out, nil
 }
 
+func (c *deviceServiceClient) RegisterDeviceByQR(ctx context.Context, in *RegisterDeviceByQRRequest, opts ...grpc.CallOption) (*RegisterDeviceResponse, error) {
+	out := new(RegisterDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_RegisterDeviceByQR_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *deviceServiceClient) RegisterDeviceByID(ctx context.Context, in *RegisterDeviceByIDRequest, opts ...grpc.CallOption) (*RegisterDeviceResponse, error) {
+	out := new(RegisterDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_RegisterDeviceByID_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *deviceServiceClient) VerifyDevice(ctx context.Context, in *VerifyDeviceRequest, opts ...grpc.CallOption) (*VerifyDeviceResponse, error) {
+	out := new(VerifyDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_VerifyDevice_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *deviceServiceClient) UnregisterDevice(ctx context.Context, in *UnregisterDeviceRequest, opts ...grpc.CallOption) (*UnregisterDeviceResponse, error) {
 	out := new(UnregisterDeviceResponse)
 	err := c.cc.Invoke(ctx, DeviceService_UnregisterDevice_FullMethodName, in, out, opts...)
@@ -265,6 +298,9 @@ type DeviceServiceServer interface {
 	CheckDeviceConnectivity(context.Context, *CheckDeviceConnectivityRequest) (*CheckDeviceConnectivityResponse, error)
 	// Device Registration
 	RegisterDevice(context.Context, *RegisterDeviceRequest) (*RegisterDeviceResponse, error)
+	RegisterDeviceByQR(context.Context, *RegisterDeviceByQRRequest) (*RegisterDeviceResponse, error)
+	RegisterDeviceByID(context.Context, *RegisterDeviceByIDRequest) (*RegisterDeviceResponse, error)
+	VerifyDevice(context.Context, *VerifyDeviceRequest) (*VerifyDeviceResponse, error)
 	UnregisterDevice(context.Context, *UnregisterDeviceRequest) (*UnregisterDeviceResponse, error)
 	RevokeDeviceCertificate(context.Context, *RevokeDeviceCertificateRequest) (*RevokeDeviceCertificateResponse, error)
 	mustEmbedUnimplementedDeviceServiceServer()
@@ -321,6 +357,15 @@ func (UnimplementedDeviceServiceServer) CheckDeviceConnectivity(context.Context,
 }
 func (UnimplementedDeviceServiceServer) RegisterDevice(context.Context, *RegisterDeviceRequest) (*RegisterDeviceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterDevice not implemented")
+}
+func (UnimplementedDeviceServiceServer) RegisterDeviceByQR(context.Context, *RegisterDeviceByQRRequest) (*RegisterDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterDeviceByQR not implemented")
+}
+func (UnimplementedDeviceServiceServer) RegisterDeviceByID(context.Context, *RegisterDeviceByIDRequest) (*RegisterDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterDeviceByID not implemented")
+}
+func (UnimplementedDeviceServiceServer) VerifyDevice(context.Context, *VerifyDeviceRequest) (*VerifyDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyDevice not implemented")
 }
 func (UnimplementedDeviceServiceServer) UnregisterDevice(context.Context, *UnregisterDeviceRequest) (*UnregisterDeviceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnregisterDevice not implemented")
@@ -629,6 +674,60 @@ func _DeviceService_RegisterDevice_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DeviceService_RegisterDeviceByQR_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterDeviceByQRRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).RegisterDeviceByQR(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_RegisterDeviceByQR_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).RegisterDeviceByQR(ctx, req.(*RegisterDeviceByQRRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DeviceService_RegisterDeviceByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterDeviceByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).RegisterDeviceByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_RegisterDeviceByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).RegisterDeviceByID(ctx, req.(*RegisterDeviceByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DeviceService_VerifyDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).VerifyDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_VerifyDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).VerifyDevice(ctx, req.(*VerifyDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DeviceService_UnregisterDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UnregisterDeviceRequest)
 	if err := dec(in); err != nil {
@@ -735,6 +834,18 @@ var DeviceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterDevice",
 			Handler:    _DeviceService_RegisterDevice_Handler,
+		},
+		{
+			MethodName: "RegisterDeviceByQR",
+			Handler:    _DeviceService_RegisterDeviceByQR_Handler,
+		},
+		{
+			MethodName: "RegisterDeviceByID",
+			Handler:    _DeviceService_RegisterDeviceByID_Handler,
+		},
+		{
+			MethodName: "VerifyDevice",
+			Handler:    _DeviceService_VerifyDevice_Handler,
 		},
 		{
 			MethodName: "UnregisterDevice",
