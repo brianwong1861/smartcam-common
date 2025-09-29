@@ -37,6 +37,9 @@ service DeviceService {
 
   // Device Registration
   rpc RegisterDevice(RegisterDeviceRequest) returns (RegisterDeviceResponse);
+  rpc RegisterDeviceByQR(RegisterDeviceByQRRequest) returns (RegisterDeviceResponse);
+  rpc RegisterDeviceByID(RegisterDeviceByIDRequest) returns (RegisterDeviceResponse);
+  rpc VerifyDevice(VerifyDeviceRequest) returns (VerifyDeviceResponse);
   rpc UnregisterDevice(UnregisterDeviceRequest) returns (UnregisterDeviceResponse);
   rpc RevokeDeviceCertificate(RevokeDeviceCertificateRequest) returns (RevokeDeviceCertificateResponse);
 }
@@ -55,6 +58,16 @@ message Device {
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
   google.protobuf.Struct metadata = 12;
+
+  // Device registration fields
+  string name = 13;
+  string location = 14;
+  string description = 15;
+  string activation_code = 16;
+  string qr_code_data = 17;
+  string registration_method = 18;
+  google.protobuf.Timestamp activated_at = 19;
+  MQTTCredentials mqtt_credentials = 20;
 }
 
 message DeviceConfiguration {
@@ -84,6 +97,35 @@ message DeviceHealth {
   google.protobuf.Timestamp last_check = 4;
   google.protobuf.Struct metrics = 5;
   repeated string issues = 6;
+}
+
+message MQTTCredentials {
+  string username = 1;
+  string broker_url = 2;
+  repeated string topics = 3;
+  string protocol = 4;
+}
+
+message DeviceStatus {
+  string device_id = 1;
+  MQTTStatus mqtt_status = 2;
+  DeviceHealthStatus device_health = 3;
+}
+
+message MQTTStatus {
+  bool is_connected = 1;
+  google.protobuf.Timestamp connected_at = 2;
+  google.protobuf.Timestamp disconnected_at = 3;
+  google.protobuf.Timestamp last_seen_at = 4;
+  string client_id = 5;
+  string ip_address = 6;
+}
+
+message DeviceHealthStatus {
+  string status = 1;
+  int32 health_score = 2;
+  string firmware_version = 3;
+  google.protobuf.Timestamp last_telemetry = 4;
 }
 
 // Request/Response Messages
@@ -288,5 +330,48 @@ message RevokeDeviceCertificateRequest {
 
 message RevokeDeviceCertificateResponse {
   bool success = 1;
+  string error_message = 2;
+}
+
+// New device registration messages
+message RegisterDeviceByQRRequest {
+  string qr_code_data = 1;
+  string name = 2;
+  string location = 3;
+  string description = 4;
+  uint32 tenant_id = 5;
+}
+
+message RegisterDeviceByIDRequest {
+  string device_id = 1;
+  string activation_code = 2;
+  string name = 3;
+  string location = 4;
+  string description = 5;
+  uint32 tenant_id = 6;
+}
+
+message VerifyDeviceRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message VerifyDeviceResponse {
+  bool is_valid = 1;
+  bool is_available = 2;
+  string device_type = 3;
+  string model = 4;
+  string manufacturer = 5;
+  string message = 6;
+  string error_message = 7;
+}
+
+message GetDeviceStatusRequest {
+  string device_id = 1;
+  uint32 tenant_id = 2;
+}
+
+message GetDeviceStatusResponse {
+  DeviceStatus device_status = 1;
   string error_message = 2;
 }
