@@ -20,7 +20,7 @@ git commit -m "feat: update logging time format to YYYYMMDD:HHMMSS
 🤖 Generated with Claude Code"
 
 # Create new version tag
-NEW_VERSION="v1.3.0"
+NEW_VERSION="v1.6.0"
 git tag -a $NEW_VERSION -m "Version $NEW_VERSION - Custom time format for logging
 
 Features:
