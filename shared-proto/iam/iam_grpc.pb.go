@@ -33,6 +33,10 @@ const (
 	IamService_CheckPermission_FullMethodName        = "/iam.IamService/CheckPermission"
 	IamService_GetUserPermissions_FullMethodName     = "/iam.IamService/GetUserPermissions"
 	IamService_GetResourcePermissions_FullMethodName = "/iam.IamService/GetResourcePermissions"
+	IamService_GetUserSettings_FullMethodName        = "/iam.IamService/GetUserSettings"
+	IamService_UpdateUserSettings_FullMethodName     = "/iam.IamService/UpdateUserSettings"
+	IamService_ResetUserSettings_FullMethodName      = "/iam.IamService/ResetUserSettings"
+	IamService_GetStorageUsage_FullMethodName        = "/iam.IamService/GetStorageUsage"
 )
 
 // IamServiceClient is the client API for IamService service.
@@ -57,6 +61,11 @@ type IamServiceClient interface {
 	CheckPermission(ctx context.Context, in *CheckPermissionRequest, opts ...grpc.CallOption) (*CheckPermissionResponse, error)
 	GetUserPermissions(ctx context.Context, in *GetUserPermissionsRequest, opts ...grpc.CallOption) (*GetUserPermissionsResponse, error)
 	GetResourcePermissions(ctx context.Context, in *GetResourcePermissionsRequest, opts ...grpc.CallOption) (*GetResourcePermissionsResponse, error)
+	// User Settings Management
+	GetUserSettings(ctx context.Context, in *UserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
+	UpdateUserSettings(ctx context.Context, in *UpdateUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
+	ResetUserSettings(ctx context.Context, in *ResetUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
+	GetStorageUsage(ctx context.Context, in *StorageUsageRequest, opts ...grpc.CallOption) (*StorageUsageResponse, error)
 }
 
 type iamServiceClient struct {
@@ -193,6 +202,42 @@ func (c *iamServiceClient) GetResourcePermissions(ctx context.Context, in *GetRe
 	return out, nil
 }
 
+func (c *iamServiceClient) GetUserSettings(ctx context.Context, in *UserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error) {
+	out := new(UserSettingsResponse)
+	err := c.cc.Invoke(ctx, IamService_GetUserSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) UpdateUserSettings(ctx context.Context, in *UpdateUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error) {
+	out := new(UserSettingsResponse)
+	err := c.cc.Invoke(ctx, IamService_UpdateUserSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) ResetUserSettings(ctx context.Context, in *ResetUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error) {
+	out := new(UserSettingsResponse)
+	err := c.cc.Invoke(ctx, IamService_ResetUserSettings_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) GetStorageUsage(ctx context.Context, in *StorageUsageRequest, opts ...grpc.CallOption) (*StorageUsageResponse, error) {
+	out := new(StorageUsageResponse)
+	err := c.cc.Invoke(ctx, IamService_GetStorageUsage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IamServiceServer is the server API for IamService service.
 // All implementations must embed UnimplementedIamServiceServer
 // for forward compatibility
@@ -215,6 +260,11 @@ type IamServiceServer interface {
 	CheckPermission(context.Context, *CheckPermissionRequest) (*CheckPermissionResponse, error)
 	GetUserPermissions(context.Context, *GetUserPermissionsRequest) (*GetUserPermissionsResponse, error)
 	GetResourcePermissions(context.Context, *GetResourcePermissionsRequest) (*GetResourcePermissionsResponse, error)
+	// User Settings Management
+	GetUserSettings(context.Context, *UserSettingsRequest) (*UserSettingsResponse, error)
+	UpdateUserSettings(context.Context, *UpdateUserSettingsRequest) (*UserSettingsResponse, error)
+	ResetUserSettings(context.Context, *ResetUserSettingsRequest) (*UserSettingsResponse, error)
+	GetStorageUsage(context.Context, *StorageUsageRequest) (*StorageUsageResponse, error)
 	mustEmbedUnimplementedIamServiceServer()
 }
 
@@ -263,6 +313,18 @@ func (UnimplementedIamServiceServer) GetUserPermissions(context.Context, *GetUse
 }
 func (UnimplementedIamServiceServer) GetResourcePermissions(context.Context, *GetResourcePermissionsRequest) (*GetResourcePermissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetResourcePermissions not implemented")
+}
+func (UnimplementedIamServiceServer) GetUserSettings(context.Context, *UserSettingsRequest) (*UserSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserSettings not implemented")
+}
+func (UnimplementedIamServiceServer) UpdateUserSettings(context.Context, *UpdateUserSettingsRequest) (*UserSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSettings not implemented")
+}
+func (UnimplementedIamServiceServer) ResetUserSettings(context.Context, *ResetUserSettingsRequest) (*UserSettingsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetUserSettings not implemented")
+}
+func (UnimplementedIamServiceServer) GetStorageUsage(context.Context, *StorageUsageRequest) (*StorageUsageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetStorageUsage not implemented")
 }
 func (UnimplementedIamServiceServer) mustEmbedUnimplementedIamServiceServer() {}
 
@@ -529,6 +591,78 @@ func _IamService_GetResourcePermissions_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IamService_GetUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).GetUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_GetUserSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).GetUserSettings(ctx, req.(*UserSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_UpdateUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).UpdateUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_UpdateUserSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).UpdateUserSettings(ctx, req.(*UpdateUserSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_ResetUserSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetUserSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).ResetUserSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_ResetUserSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).ResetUserSettings(ctx, req.(*ResetUserSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_GetStorageUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StorageUsageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).GetStorageUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_GetStorageUsage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).GetStorageUsage(ctx, req.(*StorageUsageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IamService_ServiceDesc is the grpc.ServiceDesc for IamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -591,6 +725,22 @@ var IamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetResourcePermissions",
 			Handler:    _IamService_GetResourcePermissions_Handler,
+		},
+		{
+			MethodName: "GetUserSettings",
+			Handler:    _IamService_GetUserSettings_Handler,
+		},
+		{
+			MethodName: "UpdateUserSettings",
+			Handler:    _IamService_UpdateUserSettings_Handler,
+		},
+		{
+			MethodName: "ResetUserSettings",
+			Handler:    _IamService_ResetUserSettings_Handler,
+		},
+		{
+			MethodName: "GetStorageUsage",
+			Handler:    _IamService_GetStorageUsage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
