@@ -38,6 +38,9 @@ const (
 	IamService_UpdateUserSettings_FullMethodName     = "/iam.IamService/UpdateUserSettings"
 	IamService_ResetUserSettings_FullMethodName      = "/iam.IamService/ResetUserSettings"
 	IamService_GetStorageUsage_FullMethodName        = "/iam.IamService/GetStorageUsage"
+	IamService_LogoutAllDevices_FullMethodName       = "/iam.IamService/LogoutAllDevices"
+	IamService_GetActiveSessions_FullMethodName      = "/iam.IamService/GetActiveSessions"
+	IamService_RevokeSession_FullMethodName          = "/iam.IamService/RevokeSession"
 )
 
 // IamServiceClient is the client API for IamService service.
@@ -68,6 +71,10 @@ type IamServiceClient interface {
 	UpdateUserSettings(ctx context.Context, in *UpdateUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
 	ResetUserSettings(ctx context.Context, in *ResetUserSettingsRequest, opts ...grpc.CallOption) (*UserSettingsResponse, error)
 	GetStorageUsage(ctx context.Context, in *StorageUsageRequest, opts ...grpc.CallOption) (*StorageUsageResponse, error)
+	// Session Management
+	LogoutAllDevices(ctx context.Context, in *LogoutAllDevicesRequest, opts ...grpc.CallOption) (*Empty, error)
+	GetActiveSessions(ctx context.Context, in *GetActiveSessionsRequest, opts ...grpc.CallOption) (*GetActiveSessionsResponse, error)
+	RevokeSession(ctx context.Context, in *RevokeSessionRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type iamServiceClient struct {
@@ -249,6 +256,33 @@ func (c *iamServiceClient) GetStorageUsage(ctx context.Context, in *StorageUsage
 	return out, nil
 }
 
+func (c *iamServiceClient) LogoutAllDevices(ctx context.Context, in *LogoutAllDevicesRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, IamService_LogoutAllDevices_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) GetActiveSessions(ctx context.Context, in *GetActiveSessionsRequest, opts ...grpc.CallOption) (*GetActiveSessionsResponse, error) {
+	out := new(GetActiveSessionsResponse)
+	err := c.cc.Invoke(ctx, IamService_GetActiveSessions_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) RevokeSession(ctx context.Context, in *RevokeSessionRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, IamService_RevokeSession_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IamServiceServer is the server API for IamService service.
 // All implementations must embed UnimplementedIamServiceServer
 // for forward compatibility
@@ -277,6 +311,10 @@ type IamServiceServer interface {
 	UpdateUserSettings(context.Context, *UpdateUserSettingsRequest) (*UserSettingsResponse, error)
 	ResetUserSettings(context.Context, *ResetUserSettingsRequest) (*UserSettingsResponse, error)
 	GetStorageUsage(context.Context, *StorageUsageRequest) (*StorageUsageResponse, error)
+	// Session Management
+	LogoutAllDevices(context.Context, *LogoutAllDevicesRequest) (*Empty, error)
+	GetActiveSessions(context.Context, *GetActiveSessionsRequest) (*GetActiveSessionsResponse, error)
+	RevokeSession(context.Context, *RevokeSessionRequest) (*Empty, error)
 	mustEmbedUnimplementedIamServiceServer()
 }
 
@@ -340,6 +378,15 @@ func (UnimplementedIamServiceServer) ResetUserSettings(context.Context, *ResetUs
 }
 func (UnimplementedIamServiceServer) GetStorageUsage(context.Context, *StorageUsageRequest) (*StorageUsageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStorageUsage not implemented")
+}
+func (UnimplementedIamServiceServer) LogoutAllDevices(context.Context, *LogoutAllDevicesRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LogoutAllDevices not implemented")
+}
+func (UnimplementedIamServiceServer) GetActiveSessions(context.Context, *GetActiveSessionsRequest) (*GetActiveSessionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetActiveSessions not implemented")
+}
+func (UnimplementedIamServiceServer) RevokeSession(context.Context, *RevokeSessionRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokeSession not implemented")
 }
 func (UnimplementedIamServiceServer) mustEmbedUnimplementedIamServiceServer() {}
 
@@ -696,6 +743,60 @@ func _IamService_GetStorageUsage_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IamService_LogoutAllDevices_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutAllDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).LogoutAllDevices(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_LogoutAllDevices_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).LogoutAllDevices(ctx, req.(*LogoutAllDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_GetActiveSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetActiveSessionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).GetActiveSessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_GetActiveSessions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).GetActiveSessions(ctx, req.(*GetActiveSessionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_RevokeSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).RevokeSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_RevokeSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).RevokeSession(ctx, req.(*RevokeSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IamService_ServiceDesc is the grpc.ServiceDesc for IamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -778,6 +879,18 @@ var IamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetStorageUsage",
 			Handler:    _IamService_GetStorageUsage_Handler,
+		},
+		{
+			MethodName: "LogoutAllDevices",
+			Handler:    _IamService_LogoutAllDevices_Handler,
+		},
+		{
+			MethodName: "GetActiveSessions",
+			Handler:    _IamService_GetActiveSessions_Handler,
+		},
+		{
+			MethodName: "RevokeSession",
+			Handler:    _IamService_RevokeSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
