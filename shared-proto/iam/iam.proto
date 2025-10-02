@@ -11,6 +11,7 @@ service IamService {
   // Authentication
   rpc Register(RegisterRequest) returns (AuthResponse);
   rpc Login(LoginRequest) returns (AuthResponse);
+  rpc Logout(LogoutRequest) returns (Empty);
   rpc RefreshToken(RefreshTokenRequest) returns (TokenPair);
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse);
 
@@ -91,6 +92,10 @@ message AuthResponse {
 }
 
 message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message LogoutRequest {
   string refresh_token = 1;
 }
 

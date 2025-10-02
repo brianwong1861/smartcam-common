@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 const (
 	IamService_Register_FullMethodName               = "/iam.IamService/Register"
 	IamService_Login_FullMethodName                  = "/iam.IamService/Login"
+	IamService_Logout_FullMethodName                 = "/iam.IamService/Logout"
 	IamService_RefreshToken_FullMethodName           = "/iam.IamService/RefreshToken"
 	IamService_ValidateToken_FullMethodName          = "/iam.IamService/ValidateToken"
 	IamService_GetUserProfile_FullMethodName         = "/iam.IamService/GetUserProfile"
@@ -46,6 +47,7 @@ type IamServiceClient interface {
 	// Authentication
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*AuthResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error)
 	RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*TokenPair, error)
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	// User Management
@@ -88,6 +90,15 @@ func (c *iamServiceClient) Register(ctx context.Context, in *RegisterRequest, op
 func (c *iamServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
 	out := new(AuthResponse)
 	err := c.cc.Invoke(ctx, IamService_Login_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, IamService_Logout_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -245,6 +256,7 @@ type IamServiceServer interface {
 	// Authentication
 	Register(context.Context, *RegisterRequest) (*AuthResponse, error)
 	Login(context.Context, *LoginRequest) (*AuthResponse, error)
+	Logout(context.Context, *LogoutRequest) (*Empty, error)
 	RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error)
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	// User Management
@@ -277,6 +289,9 @@ func (UnimplementedIamServiceServer) Register(context.Context, *RegisterRequest)
 }
 func (UnimplementedIamServiceServer) Login(context.Context, *LoginRequest) (*AuthResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedIamServiceServer) Logout(context.Context, *LogoutRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedIamServiceServer) RefreshToken(context.Context, *RefreshTokenRequest) (*TokenPair, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefreshToken not implemented")
@@ -371,6 +386,24 @@ func _IamService_Login_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(IamServiceServer).Login(ctx, req.(*LoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_Logout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogoutRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).Logout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_Logout_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).Logout(ctx, req.(*LogoutRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -677,6 +710,10 @@ var IamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _IamService_Login_Handler,
+		},
+		{
+			MethodName: "Logout",
+			Handler:    _IamService_Logout_Handler,
 		},
 		{
 			MethodName: "RefreshToken",
