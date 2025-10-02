@@ -36,6 +36,11 @@ service IamService {
   rpc UpdateUserSettings(UpdateUserSettingsRequest) returns (UserSettingsResponse);
   rpc ResetUserSettings(ResetUserSettingsRequest) returns (UserSettingsResponse);
   rpc GetStorageUsage(StorageUsageRequest) returns (StorageUsageResponse);
+
+  // Session Management
+  rpc LogoutAllDevices(LogoutAllDevicesRequest) returns (Empty);
+  rpc GetActiveSessions(GetActiveSessionsRequest) returns (GetActiveSessionsResponse);
+  rpc RevokeSession(RevokeSessionRequest) returns (Empty);
 }
 
 // Messages
@@ -244,4 +249,36 @@ message StorageBreakdown {
   int64 images = 2;
   int64 logs = 3;
   int64 other = 4;
+}
+
+// Session Management Messages
+message Session {
+  string uuid = 1;
+  string device_type = 2;
+  string device_name = 3;
+  string device_id = 4;
+  string ip_address = 5;
+  string user_agent = 6;
+  string location = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp last_used_at = 9;
+  google.protobuf.Timestamp expires_at = 10;
+  int32 use_count = 11;
+}
+
+message LogoutAllDevicesRequest {
+  string user_id = 1;
+}
+
+message GetActiveSessionsRequest {
+  string user_id = 1;
+}
+
+message GetActiveSessionsResponse {
+  repeated Session sessions = 1;
+}
+
+message RevokeSessionRequest {
+  string user_id = 1;
+  string session_uuid = 2;
 }
