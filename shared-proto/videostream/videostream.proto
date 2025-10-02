@@ -118,6 +118,11 @@ message Recording {
   google.protobuf.Timestamp started_at = 9;
   google.protobuf.Timestamp ended_at = 10;
   google.protobuf.Struct metadata = 11;
+  string thumbnail_url = 12;
+  string video_url = 13;
+  string resolution = 14; // e.g., "1920x1080"
+  string quality = 15; // "high", "medium", "low"
+  string format = 16; // "mp4", "mkv", "webm"
 }
 
 // Request/Response Messages
