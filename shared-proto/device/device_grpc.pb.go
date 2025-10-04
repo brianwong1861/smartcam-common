@@ -40,6 +40,9 @@ const (
 	DeviceService_VerifyDevice_FullMethodName              = "/device.DeviceService/VerifyDevice"
 	DeviceService_UnregisterDevice_FullMethodName          = "/device.DeviceService/UnregisterDevice"
 	DeviceService_RevokeDeviceCertificate_FullMethodName   = "/device.DeviceService/RevokeDeviceCertificate"
+	DeviceService_CreateOrUpdateSalesDevice_FullMethodName = "/device.DeviceService/CreateOrUpdateSalesDevice"
+	DeviceService_GetSalesDevice_FullMethodName            = "/device.DeviceService/GetSalesDevice"
+	DeviceService_GetRandomSalesDevice_FullMethodName      = "/device.DeviceService/GetRandomSalesDevice"
 )
 
 // DeviceServiceClient is the client API for DeviceService service.
@@ -73,6 +76,10 @@ type DeviceServiceClient interface {
 	VerifyDevice(ctx context.Context, in *VerifyDeviceRequest, opts ...grpc.CallOption) (*VerifyDeviceResponse, error)
 	UnregisterDevice(ctx context.Context, in *UnregisterDeviceRequest, opts ...grpc.CallOption) (*UnregisterDeviceResponse, error)
 	RevokeDeviceCertificate(ctx context.Context, in *RevokeDeviceCertificateRequest, opts ...grpc.CallOption) (*RevokeDeviceCertificateResponse, error)
+	// Sales Device Management (for device simulator)
+	CreateOrUpdateSalesDevice(ctx context.Context, in *CreateOrUpdateSalesDeviceRequest, opts ...grpc.CallOption) (*CreateOrUpdateSalesDeviceResponse, error)
+	GetSalesDevice(ctx context.Context, in *GetSalesDeviceRequest, opts ...grpc.CallOption) (*GetSalesDeviceResponse, error)
+	GetRandomSalesDevice(ctx context.Context, in *GetRandomSalesDeviceRequest, opts ...grpc.CallOption) (*GetRandomSalesDeviceResponse, error)
 }
 
 type deviceServiceClient struct {
@@ -272,6 +279,33 @@ func (c *deviceServiceClient) RevokeDeviceCertificate(ctx context.Context, in *R
 	return out, nil
 }
 
+func (c *deviceServiceClient) CreateOrUpdateSalesDevice(ctx context.Context, in *CreateOrUpdateSalesDeviceRequest, opts ...grpc.CallOption) (*CreateOrUpdateSalesDeviceResponse, error) {
+	out := new(CreateOrUpdateSalesDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_CreateOrUpdateSalesDevice_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *deviceServiceClient) GetSalesDevice(ctx context.Context, in *GetSalesDeviceRequest, opts ...grpc.CallOption) (*GetSalesDeviceResponse, error) {
+	out := new(GetSalesDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_GetSalesDevice_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *deviceServiceClient) GetRandomSalesDevice(ctx context.Context, in *GetRandomSalesDeviceRequest, opts ...grpc.CallOption) (*GetRandomSalesDeviceResponse, error) {
+	out := new(GetRandomSalesDeviceResponse)
+	err := c.cc.Invoke(ctx, DeviceService_GetRandomSalesDevice_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DeviceServiceServer is the server API for DeviceService service.
 // All implementations must embed UnimplementedDeviceServiceServer
 // for forward compatibility
@@ -303,6 +337,10 @@ type DeviceServiceServer interface {
 	VerifyDevice(context.Context, *VerifyDeviceRequest) (*VerifyDeviceResponse, error)
 	UnregisterDevice(context.Context, *UnregisterDeviceRequest) (*UnregisterDeviceResponse, error)
 	RevokeDeviceCertificate(context.Context, *RevokeDeviceCertificateRequest) (*RevokeDeviceCertificateResponse, error)
+	// Sales Device Management (for device simulator)
+	CreateOrUpdateSalesDevice(context.Context, *CreateOrUpdateSalesDeviceRequest) (*CreateOrUpdateSalesDeviceResponse, error)
+	GetSalesDevice(context.Context, *GetSalesDeviceRequest) (*GetSalesDeviceResponse, error)
+	GetRandomSalesDevice(context.Context, *GetRandomSalesDeviceRequest) (*GetRandomSalesDeviceResponse, error)
 	mustEmbedUnimplementedDeviceServiceServer()
 }
 
@@ -372,6 +410,15 @@ func (UnimplementedDeviceServiceServer) UnregisterDevice(context.Context, *Unreg
 }
 func (UnimplementedDeviceServiceServer) RevokeDeviceCertificate(context.Context, *RevokeDeviceCertificateRequest) (*RevokeDeviceCertificateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RevokeDeviceCertificate not implemented")
+}
+func (UnimplementedDeviceServiceServer) CreateOrUpdateSalesDevice(context.Context, *CreateOrUpdateSalesDeviceRequest) (*CreateOrUpdateSalesDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateOrUpdateSalesDevice not implemented")
+}
+func (UnimplementedDeviceServiceServer) GetSalesDevice(context.Context, *GetSalesDeviceRequest) (*GetSalesDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSalesDevice not implemented")
+}
+func (UnimplementedDeviceServiceServer) GetRandomSalesDevice(context.Context, *GetRandomSalesDeviceRequest) (*GetRandomSalesDeviceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRandomSalesDevice not implemented")
 }
 func (UnimplementedDeviceServiceServer) mustEmbedUnimplementedDeviceServiceServer() {}
 
@@ -764,6 +811,60 @@ func _DeviceService_RevokeDeviceCertificate_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DeviceService_CreateOrUpdateSalesDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateOrUpdateSalesDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).CreateOrUpdateSalesDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_CreateOrUpdateSalesDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).CreateOrUpdateSalesDevice(ctx, req.(*CreateOrUpdateSalesDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DeviceService_GetSalesDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSalesDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).GetSalesDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_GetSalesDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).GetSalesDevice(ctx, req.(*GetSalesDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DeviceService_GetRandomSalesDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRandomSalesDeviceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DeviceServiceServer).GetRandomSalesDevice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DeviceService_GetRandomSalesDevice_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DeviceServiceServer).GetRandomSalesDevice(ctx, req.(*GetRandomSalesDeviceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DeviceService_ServiceDesc is the grpc.ServiceDesc for DeviceService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -854,6 +955,18 @@ var DeviceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevokeDeviceCertificate",
 			Handler:    _DeviceService_RevokeDeviceCertificate_Handler,
+		},
+		{
+			MethodName: "CreateOrUpdateSalesDevice",
+			Handler:    _DeviceService_CreateOrUpdateSalesDevice_Handler,
+		},
+		{
+			MethodName: "GetSalesDevice",
+			Handler:    _DeviceService_GetSalesDevice_Handler,
+		},
+		{
+			MethodName: "GetRandomSalesDevice",
+			Handler:    _DeviceService_GetRandomSalesDevice_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

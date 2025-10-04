@@ -42,6 +42,11 @@ service DeviceService {
   rpc VerifyDevice(VerifyDeviceRequest) returns (VerifyDeviceResponse);
   rpc UnregisterDevice(UnregisterDeviceRequest) returns (UnregisterDeviceResponse);
   rpc RevokeDeviceCertificate(RevokeDeviceCertificateRequest) returns (RevokeDeviceCertificateResponse);
+
+  // Sales Device Management (for device simulator)
+  rpc CreateOrUpdateSalesDevice(CreateOrUpdateSalesDeviceRequest) returns (CreateOrUpdateSalesDeviceResponse);
+  rpc GetSalesDevice(GetSalesDeviceRequest) returns (GetSalesDeviceResponse);
+  rpc GetRandomSalesDevice(GetRandomSalesDeviceRequest) returns (GetRandomSalesDeviceResponse);
 }
 
 // Device Models
@@ -364,5 +369,54 @@ message VerifyDeviceResponse {
   string manufacturer = 5;
   string message = 6;
   string error_message = 7;
+}
+
+// Sales Device Messages (for device simulator)
+message SalesDevice {
+  string serial_number = 1;
+  string mac_address = 2;
+  string device_type = 3;
+  string model = 4;
+  string manufacturer = 5;
+  string firmware_version = 6;
+  string activation_status = 7; // 'pending', 'activated', 'deactivated'
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  google.protobuf.Struct metadata = 10;
+}
+
+message CreateOrUpdateSalesDeviceRequest {
+  string serial_number = 1;
+  string mac_address = 2;
+  string device_type = 3;
+  string model = 4;
+  string manufacturer = 5;
+  string firmware_version = 6;
+  google.protobuf.Struct metadata = 7;
+}
+
+message CreateOrUpdateSalesDeviceResponse {
+  SalesDevice device = 1;
+  bool is_new = 2; // true if created, false if updated
+  string error_message = 3;
+}
+
+message GetSalesDeviceRequest {
+  string serial_number = 1;
+}
+
+message GetSalesDeviceResponse {
+  SalesDevice device = 1;
+  bool exists = 2;
+  string error_message = 3;
+}
+
+message GetRandomSalesDeviceRequest {
+  string device_type = 1; // optional filter
+}
+
+message GetRandomSalesDeviceResponse {
+  SalesDevice device = 1;
+  string error_message = 2;
 }
 
