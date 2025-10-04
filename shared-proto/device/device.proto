@@ -345,6 +345,7 @@ message RegisterDeviceByQRRequest {
   string location = 3;
   string description = 4;
   uint32 tenant_id = 5;
+  bool test_mode = 6;  // true: 测试模式(简化流程), false: 生产模式(完整EMQX流程)
 }
 
 message RegisterDeviceByIDRequest {
