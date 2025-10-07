@@ -56,10 +56,21 @@ message Device {
   string serial_number = 3;
   string thing_name = 4;
   string device_type = 5;
-  string status = 6;
-  bool is_online = 7;
+
+  // 新的統一狀態字段
+  string lifecycle_state = 21;      // registered | activated | suspended | retired
+  string connectivity_state = 22;   // connected | disconnected
+
+  // 廢棄字段（向後兼容）
+  string status = 6 [deprecated = true];
+  bool is_online = 7 [deprecated = true];
+
   uint32 tenant_id = 8;
-  google.protobuf.Timestamp last_seen_at = 9;
+
+  // 時間戳字段
+  google.protobuf.Timestamp last_connected_at = 23;
+  google.protobuf.Timestamp last_disconnected_at = 24;
+  google.protobuf.Timestamp last_seen_at = 9 [deprecated = true];
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
   google.protobuf.Struct metadata = 12;
@@ -194,9 +205,17 @@ message ListDevicesResponse {
 message UpdateDeviceStatusRequest {
   string device_id = 1;
   uint32 tenant_id = 2;
-  string status = 3;
-  optional bool is_online = 4;
-  optional google.protobuf.Timestamp last_seen_at = 5;
+
+  // 新的統一狀態字段
+  optional string lifecycle_state = 6;      // registered | activated | suspended | retired
+  optional string connectivity_state = 7;   // connected | disconnected
+  optional google.protobuf.Timestamp last_connected_at = 8;
+  optional google.protobuf.Timestamp last_disconnected_at = 9;
+
+  // 廢棄字段（向後兼容）
+  string status = 3 [deprecated = true];
+  optional bool is_online = 4 [deprecated = true];
+  optional google.protobuf.Timestamp last_seen_at = 5 [deprecated = true];
 }
 
 message UpdateDeviceStatusResponse {
