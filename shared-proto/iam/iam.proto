@@ -41,6 +41,13 @@ service IamService {
   rpc LogoutAllDevices(LogoutAllDevicesRequest) returns (Empty);
   rpc GetActiveSessions(GetActiveSessionsRequest) returns (GetActiveSessionsResponse);
   rpc RevokeSession(RevokeSessionRequest) returns (Empty);
+
+  // Device Authentication Policy Management
+  rpc CreateDeviceAuthPolicy(CreateDeviceAuthPolicyRequest) returns (DeviceAuthPolicy);
+  rpc GetDeviceAuthPolicy(GetDeviceAuthPolicyRequest) returns (DeviceAuthPolicy);
+  rpc ValidateDeviceAuth(ValidateDeviceAuthRequest) returns (ValidateDeviceAuthResponse);
+  rpc RevokeDeviceAuth(RevokeDeviceAuthRequest) returns (Empty);
+  rpc ListDeviceAuthPolicies(ListDeviceAuthPoliciesRequest) returns (ListDeviceAuthPoliciesResponse);
 }
 
 // Messages
@@ -281,4 +288,76 @@ message GetActiveSessionsResponse {
 message RevokeSessionRequest {
   string user_id = 1;
   string session_uuid = 2;
+}
+
+// Device Authentication Policy Messages
+message DeviceAuthPolicy {
+  string id = 1;
+  string tenant_id = 2;
+  string device_id = 3;
+  string serial_number = 4;
+  string device_type = 5;
+  string policy_type = 6; // "allow", "deny", "conditional"
+  repeated string allowed_actions = 7; // ["register", "connect", "send_data", "receive_commands"]
+  string condition = 8; // JSON conditions
+  google.protobuf.Timestamp created_at = 9;
+  google.protobuf.Timestamp updated_at = 10;
+  google.protobuf.Timestamp expires_at = 11;
+  bool is_active = 12;
+  string created_by = 13;
+}
+
+message CreateDeviceAuthPolicyRequest {
+  string tenant_id = 1;
+  string device_id = 2;
+  string serial_number = 3;
+  string device_type = 4;
+  string policy_type = 5;
+  repeated string allowed_actions = 6;
+  string condition = 7;
+  google.protobuf.Timestamp expires_at = 8;
+  string created_by = 9;
+}
+
+message GetDeviceAuthPolicyRequest {
+  string tenant_id = 1;
+  string device_id = 2;
+}
+
+message ValidateDeviceAuthRequest {
+  string tenant_id = 1;
+  string device_id = 2;
+  string serial_number = 3;
+  string action = 4; // "register", "connect", "send_data", "receive_commands"
+  string device_type = 5;
+  map<string, string> metadata = 6; // Additional context for validation
+}
+
+message ValidateDeviceAuthResponse {
+  bool is_valid = 1;
+  string policy_id = 2;
+  string reason = 3;
+  repeated string allowed_actions = 4;
+  google.protobuf.Timestamp expires_at = 5;
+}
+
+message RevokeDeviceAuthRequest {
+  string tenant_id = 1;
+  string device_id = 2;
+  string reason = 3;
+  string revoked_by = 4;
+}
+
+message ListDeviceAuthPoliciesRequest {
+  string tenant_id = 1;
+  string device_type = 2;
+  bool is_active = 3;
+  int32 page_size = 4;
+  int32 page_token = 5;
+}
+
+message ListDeviceAuthPoliciesResponse {
+  repeated DeviceAuthPolicy policies = 1;
+  int32 total_count = 2;
+  string next_page_token = 3;
 }

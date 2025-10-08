@@ -41,6 +41,11 @@ const (
 	IamService_LogoutAllDevices_FullMethodName       = "/iam.IamService/LogoutAllDevices"
 	IamService_GetActiveSessions_FullMethodName      = "/iam.IamService/GetActiveSessions"
 	IamService_RevokeSession_FullMethodName          = "/iam.IamService/RevokeSession"
+	IamService_CreateDeviceAuthPolicy_FullMethodName = "/iam.IamService/CreateDeviceAuthPolicy"
+	IamService_GetDeviceAuthPolicy_FullMethodName    = "/iam.IamService/GetDeviceAuthPolicy"
+	IamService_ValidateDeviceAuth_FullMethodName     = "/iam.IamService/ValidateDeviceAuth"
+	IamService_RevokeDeviceAuth_FullMethodName       = "/iam.IamService/RevokeDeviceAuth"
+	IamService_ListDeviceAuthPolicies_FullMethodName = "/iam.IamService/ListDeviceAuthPolicies"
 )
 
 // IamServiceClient is the client API for IamService service.
@@ -75,6 +80,12 @@ type IamServiceClient interface {
 	LogoutAllDevices(ctx context.Context, in *LogoutAllDevicesRequest, opts ...grpc.CallOption) (*Empty, error)
 	GetActiveSessions(ctx context.Context, in *GetActiveSessionsRequest, opts ...grpc.CallOption) (*GetActiveSessionsResponse, error)
 	RevokeSession(ctx context.Context, in *RevokeSessionRequest, opts ...grpc.CallOption) (*Empty, error)
+	// Device Authentication Policy Management
+	CreateDeviceAuthPolicy(ctx context.Context, in *CreateDeviceAuthPolicyRequest, opts ...grpc.CallOption) (*DeviceAuthPolicy, error)
+	GetDeviceAuthPolicy(ctx context.Context, in *GetDeviceAuthPolicyRequest, opts ...grpc.CallOption) (*DeviceAuthPolicy, error)
+	ValidateDeviceAuth(ctx context.Context, in *ValidateDeviceAuthRequest, opts ...grpc.CallOption) (*ValidateDeviceAuthResponse, error)
+	RevokeDeviceAuth(ctx context.Context, in *RevokeDeviceAuthRequest, opts ...grpc.CallOption) (*Empty, error)
+	ListDeviceAuthPolicies(ctx context.Context, in *ListDeviceAuthPoliciesRequest, opts ...grpc.CallOption) (*ListDeviceAuthPoliciesResponse, error)
 }
 
 type iamServiceClient struct {
@@ -283,6 +294,51 @@ func (c *iamServiceClient) RevokeSession(ctx context.Context, in *RevokeSessionR
 	return out, nil
 }
 
+func (c *iamServiceClient) CreateDeviceAuthPolicy(ctx context.Context, in *CreateDeviceAuthPolicyRequest, opts ...grpc.CallOption) (*DeviceAuthPolicy, error) {
+	out := new(DeviceAuthPolicy)
+	err := c.cc.Invoke(ctx, IamService_CreateDeviceAuthPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) GetDeviceAuthPolicy(ctx context.Context, in *GetDeviceAuthPolicyRequest, opts ...grpc.CallOption) (*DeviceAuthPolicy, error) {
+	out := new(DeviceAuthPolicy)
+	err := c.cc.Invoke(ctx, IamService_GetDeviceAuthPolicy_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) ValidateDeviceAuth(ctx context.Context, in *ValidateDeviceAuthRequest, opts ...grpc.CallOption) (*ValidateDeviceAuthResponse, error) {
+	out := new(ValidateDeviceAuthResponse)
+	err := c.cc.Invoke(ctx, IamService_ValidateDeviceAuth_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) RevokeDeviceAuth(ctx context.Context, in *RevokeDeviceAuthRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, IamService_RevokeDeviceAuth_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *iamServiceClient) ListDeviceAuthPolicies(ctx context.Context, in *ListDeviceAuthPoliciesRequest, opts ...grpc.CallOption) (*ListDeviceAuthPoliciesResponse, error) {
+	out := new(ListDeviceAuthPoliciesResponse)
+	err := c.cc.Invoke(ctx, IamService_ListDeviceAuthPolicies_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // IamServiceServer is the server API for IamService service.
 // All implementations must embed UnimplementedIamServiceServer
 // for forward compatibility
@@ -315,6 +371,12 @@ type IamServiceServer interface {
 	LogoutAllDevices(context.Context, *LogoutAllDevicesRequest) (*Empty, error)
 	GetActiveSessions(context.Context, *GetActiveSessionsRequest) (*GetActiveSessionsResponse, error)
 	RevokeSession(context.Context, *RevokeSessionRequest) (*Empty, error)
+	// Device Authentication Policy Management
+	CreateDeviceAuthPolicy(context.Context, *CreateDeviceAuthPolicyRequest) (*DeviceAuthPolicy, error)
+	GetDeviceAuthPolicy(context.Context, *GetDeviceAuthPolicyRequest) (*DeviceAuthPolicy, error)
+	ValidateDeviceAuth(context.Context, *ValidateDeviceAuthRequest) (*ValidateDeviceAuthResponse, error)
+	RevokeDeviceAuth(context.Context, *RevokeDeviceAuthRequest) (*Empty, error)
+	ListDeviceAuthPolicies(context.Context, *ListDeviceAuthPoliciesRequest) (*ListDeviceAuthPoliciesResponse, error)
 	mustEmbedUnimplementedIamServiceServer()
 }
 
@@ -387,6 +449,21 @@ func (UnimplementedIamServiceServer) GetActiveSessions(context.Context, *GetActi
 }
 func (UnimplementedIamServiceServer) RevokeSession(context.Context, *RevokeSessionRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RevokeSession not implemented")
+}
+func (UnimplementedIamServiceServer) CreateDeviceAuthPolicy(context.Context, *CreateDeviceAuthPolicyRequest) (*DeviceAuthPolicy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDeviceAuthPolicy not implemented")
+}
+func (UnimplementedIamServiceServer) GetDeviceAuthPolicy(context.Context, *GetDeviceAuthPolicyRequest) (*DeviceAuthPolicy, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDeviceAuthPolicy not implemented")
+}
+func (UnimplementedIamServiceServer) ValidateDeviceAuth(context.Context, *ValidateDeviceAuthRequest) (*ValidateDeviceAuthResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ValidateDeviceAuth not implemented")
+}
+func (UnimplementedIamServiceServer) RevokeDeviceAuth(context.Context, *RevokeDeviceAuthRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokeDeviceAuth not implemented")
+}
+func (UnimplementedIamServiceServer) ListDeviceAuthPolicies(context.Context, *ListDeviceAuthPoliciesRequest) (*ListDeviceAuthPoliciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDeviceAuthPolicies not implemented")
 }
 func (UnimplementedIamServiceServer) mustEmbedUnimplementedIamServiceServer() {}
 
@@ -797,6 +874,96 @@ func _IamService_RevokeSession_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _IamService_CreateDeviceAuthPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDeviceAuthPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).CreateDeviceAuthPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_CreateDeviceAuthPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).CreateDeviceAuthPolicy(ctx, req.(*CreateDeviceAuthPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_GetDeviceAuthPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDeviceAuthPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).GetDeviceAuthPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_GetDeviceAuthPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).GetDeviceAuthPolicy(ctx, req.(*GetDeviceAuthPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_ValidateDeviceAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidateDeviceAuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).ValidateDeviceAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_ValidateDeviceAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).ValidateDeviceAuth(ctx, req.(*ValidateDeviceAuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_RevokeDeviceAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RevokeDeviceAuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).RevokeDeviceAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_RevokeDeviceAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).RevokeDeviceAuth(ctx, req.(*RevokeDeviceAuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _IamService_ListDeviceAuthPolicies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDeviceAuthPoliciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(IamServiceServer).ListDeviceAuthPolicies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: IamService_ListDeviceAuthPolicies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(IamServiceServer).ListDeviceAuthPolicies(ctx, req.(*ListDeviceAuthPoliciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // IamService_ServiceDesc is the grpc.ServiceDesc for IamService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -891,6 +1058,26 @@ var IamService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevokeSession",
 			Handler:    _IamService_RevokeSession_Handler,
+		},
+		{
+			MethodName: "CreateDeviceAuthPolicy",
+			Handler:    _IamService_CreateDeviceAuthPolicy_Handler,
+		},
+		{
+			MethodName: "GetDeviceAuthPolicy",
+			Handler:    _IamService_GetDeviceAuthPolicy_Handler,
+		},
+		{
+			MethodName: "ValidateDeviceAuth",
+			Handler:    _IamService_ValidateDeviceAuth_Handler,
+		},
+		{
+			MethodName: "RevokeDeviceAuth",
+			Handler:    _IamService_RevokeDeviceAuth_Handler,
+		},
+		{
+			MethodName: "ListDeviceAuthPolicies",
+			Handler:    _IamService_ListDeviceAuthPolicies_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
